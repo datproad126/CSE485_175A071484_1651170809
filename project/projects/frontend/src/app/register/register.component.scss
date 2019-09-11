@@ -1,0 +1,42 @@
+$font: "Google Sans", arial, sans-serif;
+.wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  .formSignup {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 750px;
+    margin: auto;
+    font-family: $font;
+    border: 1px solid;
+    border-color: rgba(5, 5, 5, 0.233);
+    padding: 48px 40px 36px;
+    border-radius: 5px;
+    .content {
+      margin: 0;
+      .logo {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        img {
+          width: 244px;
+          height: 244px !important;
+        }
+      }
+    }
+    h2 {
+      font-family: $font;
+      padding-bottom: 0;
+      padding-top: 16px;
+      font-size: 24px;
+      font-weight: 400;
+      line-height: 32px;
+      margin: 0;
+    }
+  }
+}
