@@ -55,6 +55,25 @@ export const navItems: NavData[] = [
   },
   {
     title: true,
+    name: 'admin'
+  },
+  {
+    name: 'post',
+    url: '/post',
+    icon: 'icon-star'
+  },
+  {
+    name: 'category',
+    url: '/category',
+    icon: 'icon-star'
+  },
+  {
+    name: 'user',
+    url: '/user',
+    icon: 'icon-star'
+  },
+  {
+    title: true,
     name: 'Components'
   },
   {
@@ -256,19 +275,19 @@ export const navItems: NavData[] = [
     },
     attributes: { disabled: true },
   },
-  {
-    name: 'Download CoreUI',
-    url: 'http://coreui.io/angular/',
-    icon: 'icon-cloud-download',
-    class: 'mt-auto',
-    variant: 'success',
-    attributes: { target: '_blank', rel: 'noopener' }
-  },
-  {
-    name: 'Try CoreUI PRO',
-    url: 'http://coreui.io/pro/angular/',
-    icon: 'icon-layers',
-    variant: 'danger',
-    attributes: { target: '_blank', rel: 'noopener' }
-  }
+  // {
+  //   name: 'Download CoreUI',
+  //   url: 'http://coreui.io/angular/',
+  //   icon: 'icon-cloud-download',
+  //   class: 'mt-auto',
+  //   variant: 'success',
+  //   attributes: { target: '_blank', rel: 'noopener' }
+  // },
+  // {
+  //   name: 'Try CoreUI PRO',
+  //   url: 'http://coreui.io/pro/angular/',
+  //   icon: 'icon-layers',
+  //   variant: 'danger',
+  //   attributes: { target: '_blank', rel: 'noopener' }
+  // }
 ];

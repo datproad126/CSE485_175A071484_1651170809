@@ -12,7 +12,6 @@ import { Error500Component } from './error/error500.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -23,7 +22,7 @@ import { RegisterComponent } from './register/register.component';
     Error404Component,
     Error500Component,
     LoginComponent,
-    RegisterComponent
+    RegisterComponent,
   ],
   imports: [
     BrowserModule,
