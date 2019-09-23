@@ -2,3 +2,16 @@ input[type="checkbox"] {
   width: 17px;
   height: 17px;
 }
+.pagination {
+  position: absolute;
+  right: 20px;
+}
+.card .card-header select {
+  display: inline-block;
+  width: auto;
+}
+.numPageSearch {
+  display:inline-block;
+  width: 60px ;
+  text-align: right;
+}

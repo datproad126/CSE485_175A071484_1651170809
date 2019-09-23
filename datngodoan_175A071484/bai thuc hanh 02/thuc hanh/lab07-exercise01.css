@@ -1,0 +1,23 @@
+div.entry {
+  background-color: #fff8dc;
+}
+
+div.entryContent {
+  background-color: #f0f8ff;
+}
+
+h1 span {
+  color: #8b0000;
+  font-size: 1.5em;
+  /* adding display:block */
+  display: block;
+}
+
+/* adding display inline in li tag  */
+li {
+  display: inline;
+}
+/* adding display block in to img tag */
+div img {
+  display: block;
+}

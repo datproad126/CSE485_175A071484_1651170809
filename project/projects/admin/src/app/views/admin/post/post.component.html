@@ -1,17 +1,64 @@
 <div class="card">
    <div class="card-header">
-      <i class="fa fa-align-justify"></i>
-      <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal" (click)="largeModal.show()">Add
-         User</button>
+      <div class="row">
+         <div class="col-8 col-md-8">
+            <!-- <i class="fa fa-align-justify"></i> -->
+            <button type="button" class="btn btn-outline-primary" data-toggle="modal" (click)="createNewUser()">
+               <i class="fa fa-user-plus"></i>
+               Add
+               User</button>
+         </div>
+         <div class="col-4 col-md-4">
+            <div class="input-group">
+               <input type="text" id="input1-group2" name="input1-group2" class="form-control" placeholder="Username">
+               <span class="input-group-prepend">
+                  <button type="button" class="btn btn-outline-primary"><i class="fa fa-search"></i> Search</button>
+               </span>
+            </div>
+         </div>
+      </div>
+      <br>
+      <!-- list-user -->
+      <div class="row">
+         <!-- filter -->
+         <div class="col-sm-12 col-xl-10">
+
+            <label>
+               Filter by status:
+               <select class="form-control" id="filter" name="filter">
+                  <option value="0">Option #</option>
+                  <option value="1">Option #1</option>
+                  <option value="2">Option #2</option>
+                  <option value="3">Option #3</option>
+               </select>
+            </label>
+
+         </div>
+         <div class="col-sm-12 col-xl-2">
+
+            <label style="position: absolute; right: 12px">
+               Show:
+               <select class="form-control" [(ngModel)]="entry">
+                  <option *ngFor="let entry of entries" [(value)]="entry.value"> {{ entry.name }} </option>
+               </select>
+               entries
+            </label>
+         </div>
+         <!-- <div class="col-8 col-md-8">
+            <button type="button" class="btn btn-outline-primary" data-toggle="modal" (click)="primaryModal.show()">
+               <i class="fa fa-user-plus"></i>
+               Add
+               User</button>
+         </div> -->
+
+      </div>
    </div>
    <div class="card-body">
       <table class="table table-striped">
          <thead>
             <tr>
                <th><input type="checkbox" id="checkall"></th>
-               <th>ID</th>
                <th>UserName</th>
-               <th>Password</th>
                <th>Display Name</th>
                <th>Created Date</th>
                <th>Role</th>
@@ -19,106 +66,121 @@
             </tr>
          </thead>
          <tbody>
-            <!-- *ngFor="let user of users" -->
-            <tr *ngFor="let user of users">
+            <tr *ngFor="let user of getItems()">
                <td><input type="checkbox" id="check" value="option1"></td>
-               <td>12344</td>
-               <td>dxskeeper</td>
-               <td>datngodoan</td>
-               <td>ngô doãn đạt</td>
-               <td>12/2/2019</td>
-               <td>customer</td>
+               <td>{{ user.username }}</td>
+               <td>{{ user.name }}</td>
+               <td>{{ user.created_dt }}</td>
+               <td>{{ user.role }}</td>
                <td>
-                  <button type="button" class="btn btn-sm btn-outline-danger" style="margin-right: 5px">remove</button>
-                  <button type="button" class="btn btn-sm btn-outline-primary">edit</button>
-               </td>
-            </tr>
-            <tr>
-               <td><input type="checkbox" id="check" value="option1"></td>
-               <td>12344</td>
-               <td>dxskeeper</td>
-               <td>datngodoan</td>
-               <td>ngô doãn đạt</td>
-               <td>12/2/2019</td>
-               <td>customer</td>
-               <td>
-                  <button type="button" class="btn btn-sm btn-outline-danger" style="margin-right: 5px">remove</button>
-                  <button type="button" class="btn btn-sm btn-outline-primary">edit</button>
-               </td>
-            </tr>
-            <tr>
-               <td><input type="checkbox" id="check" value="option1"></td>
-               <td>12344</td>
-               <td>dxskeeper</td>
-               <td>datngodoan</td>
-               <td>ngô doãn đạt</td>
-               <td>12/2/2019</td>
-               <td>customer</td>
-               <td>
-                  <button type="button" class="btn btn-sm btn-outline-danger" style="margin-right: 5px">remove</button>
-                  <button type="button" class="btn btn-sm btn-outline-primary">edit</button>
-               </td>
-            </tr>
-            <tr>
-               <td><input type="checkbox" id="check" value="option1"></td>
-               <td>12344</td>
-               <td>dxskeeper</td>
-               <td>datngodoan</td>
-               <td>ngô doãn đạt</td>
-               <td>12/2/2019</td>
-               <td>customer</td>
-               <td>
-                  <button type="button" class="btn btn-sm btn-outline-danger" style="margin-right: 5px">remove</button>
-                  <button type="button" class="btn btn-sm btn-outline-primary">edit</button>
-               </td>
-            </tr>
-            <tr>
-               <td><input type="checkbox" id="check" value="option1"></td>
-               <td>12344</td>
-               <td>dxskeeper</td>
-               <td>datngodoan</td>
-               <td>ngô doãn đạt</td>
-               <td>12/2/2019</td>
-               <td>customer</td>
-               <td>
-                  <button type="button" class="btn btn-sm btn-outline-danger" style="margin-right: 5px">remove</button>
-                  <button type="button" class="btn btn-sm btn-outline-primary">edit</button>
+                  <button type="button" class="btn btn-sm btn-outline-danger" style="margin-right: 5px"
+                     (click)="removeUser(user)"><i class="fa fa-trash-o"></i> remove</button>
+                  <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal"
+                     (click)="editUser(user)" style="margin-right: 5px"><i class="fa fa-pencil"></i> edit</button>
+                  <!-- <button type="button" class="btn btn-sm btn-outline-success" style="margin-right: 5px"
+                     (click)="viewUser(user)"><i class="fa fa-eye"></i> view</button> -->
                </td>
             </tr>
          </tbody>
       </table>
-      <ul class="pagination">
-         <li class="page-item"><a class="page-link" href="#">Prev</a></li>
-         <li class="page-item active">
-            <a class="page-link" href="#">1</a>
-         </li>
-         <li class="page-item"><a class="page-link" href="#">2</a></li>
-         <li class="page-item"><a class="page-link" href="#">3</a></li>
-         <li class="page-item"><a class="page-link" href="#">4</a></li>
-         <li class="page-item"><a class="page-link" href="#">Next</a></li>
-      </ul>
+
+   </div>
+   <div class="card-footer">
+      <div class="row">
+         <div class="col-sm col-md">
+            <p class="show-entries">Page: {{currentPage + 1}} / {{numPages}} of {{numPages}} pages</p>
+         </div>
+         <!-- <div class="col-sm col-md" style="text-align: right">
+            <form>
+               <input #numPageSearch type="text" class="form-control numPageSearch" placeholder="page"
+                  (keydown)="keyDownFunction($event,numPageSearch.value)">
+               / {{numPages}}
+            </form>
+         </div> -->
+         <div class="col-sm col-md-3">
+            <pagination [totalItems]="bigTotalItems" [(ngModel)]="currentPage" [maxSize]="maxSize" class="pagination"
+               previousText="&lsaquo;" nextText="&rsaquo;" firstText="&laquo;" lastText="&raquo;" [boundaryLinks]="true"
+               [rotate]="false" [itemsPerPage]="entry" (numPages)="numPages = $event"
+               (pageChanged)="pageChanged($event)">
+            </pagination>
+         </div>
+      </div>
    </div>
 </div>
 
 
-<!-- large modal form -->
-<div bsModal #largeModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+<!--modal form add user-->
+<div bsModal #primaryModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
    aria-hidden="true">
-   <div class="modal-dialog modal-lg" role="document">
+   <div class="modal-dialog modal-primary" role="document">
       <div class="modal-content">
          <div class="modal-header">
-            <h4 class="modal-title">Modal title</h4>
-            <button type="button" class="close" (click)="largeModal.hide()" aria-label="Close">
+            <h4 class="modal-title">
+               {{ isEdit ? 'Edit account' : 'Add account' }}
+            </h4>
+            <button type="button" class="close" (click)="primaryModal.hide()" aria-label="Close">
                <span aria-hidden="true">&times;</span>
             </button>
          </div>
          <div class="modal-body">
-            <p>One fine body&hellip;</p>
+
+            <form [formGroup]="editForm" (ngSubmit)='onSubmit()'>
+               <div class="row">
+                  <div class="form-group col">
+
+                     <label for="UserName">User Name:</label>
+                     <input type="text" formControlName="UserName" placeholder="User Name" name="UserName"
+                        class="form-control" id="UserName">
+                  </div>
+                  <div class="form-group col">
+                     <label for="DisplayName">Display Name:</label>
+                     <input type="text" formControlName="DisplayName" placeholder="Display Name" name="DisplayName"
+                        class="form-control is-invalid" id="DisplayName">
+                     <div class="invalid-feedback">
+                        Please provide a valid information.
+                     </div>
+                  </div>
+               </div>
+
+               <div class="form-group">
+                  <label for="Password">Password:</label>
+                  <input type="password" formControlName="Password" placeholder="Password" name="Password"
+                     class="form-control is-valid" id="Password">
+                  <div class="valid-feedback">
+                     Please provide a valid information.
+                  </div>
+               </div>
+
+               <div class="form-group">
+                  <label for="Confirm">Confirm:</label>
+                  <input type="password" formControlName="Confirm" placeholder="Confirm" name="Confirm"
+                     class="form-control" id="Confirm">
+               </div>
+
+               <div class="form-group">
+                  <label for="Role">Role:</label>
+                  <select id="Role" name="Role" class="form-control">
+                     <option value="0">Admin</option>
+                     <option value="1">user</option>
+                  </select>
+               </div>
+            </form>
          </div>
          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" (click)="largeModal.hide()">Close</button>
-            <button type="button" class="btn btn-primary">Save changes</button>
+            <button type="button" class="btn btn-secondary" (click)="primaryModal.hide()"><i class="fa fa-remove"></i>
+               Close</button>
+            <button type="submit" class="btn btn-primary">
+               <ng-container *ngIf="!isEdit; else elseTemplate">
+                  <i class="fa fa-user-plus"></i> Add User
+               </ng-container>
+               <ng-template #elseTemplate>
+                  <i class="fa fa-pencil"></i> Edit User
+               </ng-template>
+            </button>
+
          </div>
       </div><!-- /.modal-content -->
-   </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+   </div>
+   <!-- /.modal-dialog-->
+</div>
+<!-- /.modal -->
