@@ -2,8 +2,8 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { controllers } from 'chart.js';
-// import { UserService } from '../../../services/user.service';
-// import { User } from '../../../model/user';
+import { UserService } from '../../../services/user.service';
+import { User } from '../../../model/user';
 
 
 @Component({

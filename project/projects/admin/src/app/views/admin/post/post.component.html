@@ -39,7 +39,6 @@
                Show:
                <select class="form-control" [(ngModel)]="entry">
                   <option *ngFor="let entry of entries" [value]="entry.value"> {{ entry.name }} </option>
-
                </select>
                entries
             </label>
@@ -57,7 +56,6 @@
       <table class="table table-striped">
          <thead>
             <tr>
-
                <th><input type="checkbox" [(ngModel)]="selectAll" (ngModelChange)="checkUncheckAll($event)"></th>
                <th>ID</th>
                <th>UserName</th>
@@ -174,7 +172,6 @@
                      <div *ngIf="f.confirmPassword.errors.required">Confirm Password is required</div>
                      <div *ngIf="f.confirmPassword.errors.mustMatch">Passwords must match</div>
                   </div>
-
                </div>
 
                <div class="form-group">
