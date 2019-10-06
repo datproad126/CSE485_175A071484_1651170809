@@ -5,7 +5,6 @@ import { controllers } from 'chart.js';
 import { UserService } from '../../../services/user.service';
 import { User } from '../../../model/user';
 
-
 @Component({
   selector: 'app-post',
   templateUrl: './post.component.html',
@@ -37,7 +36,6 @@ export class PostComponent implements OnInit {
   constructor(private fb: FormBuilder, private userService: UserService) { }
 
   ngOnInit() {
-
     this.setForm({});
     this.entries = [
       { name: '10', value: 10 },
