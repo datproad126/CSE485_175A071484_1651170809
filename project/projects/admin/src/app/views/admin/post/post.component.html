@@ -34,12 +34,11 @@
             </label>
 
          </div>
-         <div class="col-sm-12 col-xl-2">
-
+         <div class="col-sm-12 col-xl-2 form-group">
             <label style="position: absolute; right: 12px">
                Show:
                <select class="form-control" [(ngModel)]="entry">
-                  <option *ngFor="let entry of entries" [(value)]="entry.value"> {{ entry.name }} </option>
+                  <option *ngFor="let entry of entries" [value]="entry.value"> {{ entry.name }} </option>
                </select>
                entries
             </label>
@@ -57,9 +56,12 @@
       <table class="table table-striped">
          <thead>
             <tr>
-               <th><input type="checkbox" id="checkall"></th>
+               <th><input type="checkbox" [(ngModel)]="selectAll" (ngModelChange)="checkUncheckAll($event)"></th>
+               <th>ID</th>
                <th>UserName</th>
                <th>Display Name</th>
+               <th>Email</th>
+               <th>Password</th>
                <th>Created Date</th>
                <th>Role</th>
                <th>Action</th>
@@ -67,13 +69,16 @@
          </thead>
          <tbody>
             <tr *ngFor="let user of getItems()">
-               <td><input type="checkbox" id="check" value="option1"></td>
+               <td><input type="checkbox" [(ngModel)]="itemSelected[user.id]" (ngModelChange)="onChange($event)"></td>
+               <td>{{ user.id }}</td>
                <td>{{ user.username }}</td>
                <td>{{ user.name }}</td>
-               <td>{{ user.created_dt }}</td>
-               <td>{{ user.role }}</td>
+               <td>{{ user.email }}</td>
+               <td>{{ user.password }}</td>
+               <td>{{user.dateCreated | date:format }}</td>
+               <td>{{ user.role ? 'admin' : 'user'}}</td>
                <td>
-                  <button type="button" class="btn btn-sm btn-outline-danger" style="margin-right: 5px"
+                  <button type=" button" class="btn btn-sm btn-outline-danger" style="margin-right: 5px"
                      (click)="removeUser(user)"><i class="fa fa-trash-o"></i> remove</button>
                   <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal"
                      (click)="editUser(user)" style="margin-right: 5px"><i class="fa fa-pencil"></i> edit</button>
@@ -88,15 +93,8 @@
    <div class="card-footer">
       <div class="row">
          <div class="col-sm col-md">
-            <p class="show-entries">Page: {{currentPage + 1}} / {{numPages}} of {{numPages}} pages</p>
+            <p class="show-entries">Page: {{currentPage}} / {{numPages}} of {{numPages}} pages</p>
          </div>
-         <!-- <div class="col-sm col-md" style="text-align: right">
-            <form>
-               <input #numPageSearch type="text" class="form-control numPageSearch" placeholder="page"
-                  (keydown)="keyDownFunction($event,numPageSearch.value)">
-               / {{numPages}}
-            </form>
-         </div> -->
          <div class="col-sm col-md-3">
             <pagination [totalItems]="bigTotalItems" [(ngModel)]="currentPage" [maxSize]="maxSize" class="pagination"
                previousText="&lsaquo;" nextText="&rsaquo;" firstText="&laquo;" lastText="&raquo;" [boundaryLinks]="true"
@@ -107,7 +105,6 @@
       </div>
    </div>
 </div>
-
 
 <!--modal form add user-->
 <div bsModal #primaryModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
@@ -130,31 +127,51 @@
 
                      <label for="UserName">User Name:</label>
                      <input type="text" formControlName="UserName" placeholder="User Name" name="UserName"
-                        class="form-control" id="UserName">
+                        class="form-control" [ngClass]="{'is-invalid': submitted && f.UserName.errors }" id="UserName">
+                     <div *ngIf="submitted && f.firstName.errors" class="invalid-feedback">
+                        <div *ngIf="f.firstName.errors.required">First Name is required</div>
+                     </div>
                   </div>
+
                   <div class="form-group col">
                      <label for="DisplayName">Display Name:</label>
                      <input type="text" formControlName="DisplayName" placeholder="Display Name" name="DisplayName"
-                        class="form-control is-invalid" id="DisplayName">
-                     <div class="invalid-feedback">
-                        Please provide a valid information.
+                        [ngClass]="{'is-invalid': submitted && f.DisplayName.errors }" class="form-control"
+                        id="DisplayName">
+                     <div *ngIf="submitted && f.lastName.errors" class="invalid-feedback">
+                        <div *ngIf="f.lastName.errors.required">Last Name is required</div>
                      </div>
+                  </div>
+               </div>
+
+               <div class="form-group">
+                  <label for="Email">Email:</label>
+                  <input type="text" formControlName="Email" placeholder="Email" name="Email" class="form-control"
+                     [ngClass]="{ 'is-invalid': submitted && f.Password.errors }" id="Password">
+                  <div *ngIf="submitted && f.Email.errors" class="invalid-feedback">
+                     <div *ngIf="f.Email.errors.required">Email is required</div>
+                     <div *ngIf="f.Email.errors.minlength">Email must be at least 6 characters</div>
                   </div>
                </div>
 
                <div class="form-group">
                   <label for="Password">Password:</label>
                   <input type="password" formControlName="Password" placeholder="Password" name="Password"
-                     class="form-control is-valid" id="Password">
-                  <div class="valid-feedback">
-                     Please provide a valid information.
+                     class="form-control" [ngClass]="{ 'is-invalid': submitted && f.Password.errors }" id="Password">
+                  <div *ngIf="submitted && f.password.errors" class="invalid-feedback">
+                     <div *ngIf="f.password.errors.required">Password is required</div>
+                     <div *ngIf="f.password.errors.minlength">Password must be at least 6 characters</div>
                   </div>
                </div>
 
                <div class="form-group">
                   <label for="Confirm">Confirm:</label>
                   <input type="password" formControlName="Confirm" placeholder="Confirm" name="Confirm"
-                     class="form-control" id="Confirm">
+                     class="form-control" [ngClass]="{ 'is-invalid': submitted && f.Password.errors }" id="Confirm">
+                  <div *ngIf="submitted && f.confirmPassword.errors" class="invalid-feedback">
+                     <div *ngIf="f.confirmPassword.errors.required">Confirm Password is required</div>
+                     <div *ngIf="f.confirmPassword.errors.mustMatch">Passwords must match</div>
+                  </div>
                </div>
 
                <div class="form-group">
