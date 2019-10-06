@@ -40,8 +40,8 @@ import { AppRoutingModule } from './app.routing';
 // Import 3rd party components
 import { ChartsModule } from 'ng2-charts';
 import { PostComponent } from './views/admin/post/post.component';
-import { ModalModule, AlertModule, BsDropdownModule, TabsModule,PaginationModule  } from 'ngx-bootstrap';
-
+import { ModalModule, AlertModule, BsDropdownModule, TabsModule, PaginationModule } from 'ngx-bootstrap';
+import { HttpClientModule } from '@angular/common/http';
 
 
 @NgModule({
@@ -62,7 +62,8 @@ import { ModalModule, AlertModule, BsDropdownModule, TabsModule,PaginationModule
     AlertModule.forRoot(),
     FormsModule,
     ReactiveFormsModule,
-    PaginationModule.forRoot()
+    PaginationModule.forRoot(),
+    HttpClientModule
   ],
   declarations: [
     AppComponent,
