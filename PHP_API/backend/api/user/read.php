@@ -1,14 +1,21 @@
 <?php
-require_once('../conf/header.php');
+// required headers
+header("Access-Control-Allow-Origin: *");
+header("Content-Type: application/json");
+header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
+
+// include database and object files
 require_once('../conf/settings.config.php');
 require_once('user.php');
+
 try {
    $user = new user($localhost);
    // fetching all user
    $rows = $user->read();
+
    $users_arr = array();
    $users_arr["user"] = array();
-   if ($rows > 0) {
+   if ((array) $rows > 0) {
       foreach ($rows as $key => $row) {
          extract($row);
          $user_item = array(
@@ -31,10 +38,12 @@ try {
          array("message" => "No products found.")
       );
    }
+   // set response code - 200 OK
+   http_response_code(200);
+
+   // show products data in json format
    echo json_encode($users_arr);
 } catch (PDOException $e) {
 
    echo "There is some problem in connection: " . $e->getMessage();
 }
-
-// pagination 

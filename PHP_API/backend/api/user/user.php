@@ -11,7 +11,7 @@ class user extends DBConnection
    public $password;
    public $display_name;
    public $email;
-   public $dateCreated;
+   public $registered_date;
    public $role;
    // read user
    public function read()
@@ -21,30 +21,63 @@ class user extends DBConnection
       // getquery statement
       return parent::getQuery($query);
    }
+   // used when filling up the update user form
+   function readOne()
+   {
+      try {
+         // query to read single record
+         $query = "SELECT * FROM " . $this->table_name . "
+           WHERE
+               p.id = ?
+           LIMIT
+               0,1";
+
+         // prepare query statement
+         $stmt = $this->dbc->prepare($query);
+
+         // bind id of user to be updated
+         $stmt->bindParam(1, $this->id);
+
+         // execute query
+         $stmt->execute();
+
+         // get retrieved row
+         $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+         // set values to object properties
+         $this->id = $row['id'];
+         $this->username = $row['username'];
+         $this->password = $row['password'];
+         $this->display_name = $row['display_name'];
+         $this->email = $row['email'];
+         $this->registered_date = $row['registered_date'];
+         $this->role = $row['role'];
+      } catch (PDOException $e) {
+         echo "There is some problem: " . $e->getMessage();
+      }
+   }
    // create user
    function create()
    {
 
       // query to insert record
       $query = "INSERT INTO" . $this->table .
-         " SET username=:username, password=:password, display_name=:display_name, email=:email, role=:role";
+         " SET username=:username, password=:password, display_name=:display_name, email=:email";
 
       // prepare query
       $stmt = $this->dbc->query($query);
 
       // sanitize
       $this->username = htmlspecialchars(strip_tags($this->username));
-      $this->password = htmlspecialchars(strip_tags($this->password));
+      $this->password = htmlspecialchars(strip_tags(password_hash($this->password, PASSWORD_DEFAULT)));
       $this->display_name = htmlspecialchars(strip_tags($this->display_name));
       $this->email = htmlspecialchars(strip_tags($this->email));
-      $this->role = htmlspecialchars(strip_tags($this->role));
 
       // bind values
       $stmt->bindParam(":username", $this->username);
       $stmt->bindParam(":password", $this->password);
       $stmt->bindParam(":display_name", $this->display_name);
       $stmt->bindParam(":email", $this->email);
-      $stmt->bindParam(":role", $this->role);
 
       // execute query
       if ($stmt->execute()) {
@@ -95,25 +128,28 @@ class user extends DBConnection
    // delete user
    function delete()
    {
+      try {
+         // delete query
+         $query = "DELETE FROM " . $this->table . " WHERE id = ?";
 
-      // delete query
-      $query = "DELETE FROM " . $this->table_name . " WHERE id = ?";
+         // prepare query
+         $stmt = $this->dbc->prepare($query);
 
-      // prepare query
-      $stmt = $this->conn->prepare($query);
+         // sanitize
+         $this->id = htmlspecialchars(strip_tags($this->id));
 
-      // sanitize
-      $this->id = htmlspecialchars(strip_tags($this->id));
+         // bind id of record to delete`
+         $stmt->bindParam(1, $this->id);
 
-      // bind id of record to delete
-      $stmt->bindParam(1, $this->id);
+         // execute query
+         if ($stmt->execute()) {
+            return true;
+         }
 
-      // execute query
-      if ($stmt->execute()) {
-         return true;
+         return false;
+      } catch (PDOException $e) {
+         echo "There is some problem: " . $e->getMessage();
       }
-
-      return false;
    }
    // search user
    function search($keywords)
@@ -144,15 +180,15 @@ class user extends DBConnection
 
       return $stmt;
    }
-      // used for paging products
-      public function count()
-      {
-         $query = "SELECT COUNT(*) as total_rows FROM " . $this->table_name . "";
-   
-         $stmt = $this->conn->prepare($query);
-         $stmt->execute();
-         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-   
-         return $row['total_rows'];
-      }
+   // used for paging users
+   public function count()
+   {
+      $query = "SELECT COUNT(*) as total_rows FROM " . $this->table_name . "";
+
+      $stmt = $this->conn->prepare($query);
+      $stmt->execute();
+      $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+      return $row['total_rows'];
+   }
 }
