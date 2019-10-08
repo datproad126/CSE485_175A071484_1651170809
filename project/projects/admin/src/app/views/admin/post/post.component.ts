@@ -1,16 +1,23 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
-import { controllers } from 'chart.js';
+import { ModalDirective } from 'ngx-bootstrap/modal';
+// import { controllers } from 'chart.js';
 import { UserService } from '../../../services/user.service';
 import { User } from '../../../model/user';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { PopoverDirective } from 'ngx-bootstrap';
+import { ToastrService } from 'ngx-toastr';
+
 
 @Component({
   selector: 'app-post',
   templateUrl: './post.component.html',
   styleUrls: ['./post.component.css']
 })
-export class PostComponent implements OnInit {
+export class PostComponent implements OnInit, OnDestroy {
+  private componetDestroyed: Subject<any> = new Subject();
+
   // test observerble
   users: User[];
   // checkbox
@@ -31,9 +38,9 @@ export class PostComponent implements OnInit {
   maxpage: number;
   entry = '10';
   entries: any[];
-  @ViewChild('primaryModal', { static: true }) primaryModal;
-
-  constructor(private fb: FormBuilder, private userService: UserService) { }
+  @ViewChild('primaryModal', { static: true }) primaryModal: ModalDirective;
+  @ViewChild('pop', { static: true }) pop: PopoverDirective;
+  constructor(private fb: FormBuilder, private userService: UserService, private toastr: ToastrService) { }
 
   ngOnInit() {
     this.setForm({});
@@ -43,25 +50,44 @@ export class PostComponent implements OnInit {
       { name: '50', value: 50 },
       { name: '100', value: 100 }
     ];
-    this.getData();
+    this.readData();
   }
+
+  ngOnDestroy() {
+    this.componetDestroyed.next();
+    this.componetDestroyed.unsubscribe();
+  }
+
+
   // Observable data get method restapi
-  getData(): void {
+  readData(): void {
+
     const usersObservable = this.userService.readUserData();
     const usersObserverhttp = {
       next: (data) => {
-        this.users = data['user'];
+        this.users = data.user;
         this.bigTotalItems = this.users.length;
       },
       error: err => console.error('Observer got an error: ' + err),
       complete: () => console.log('Observer got a complete notification')
     };
     const subscription = usersObservable.subscribe(usersObserverhttp);
-    setTimeout(() => {
-      subscription.unsubscribe();
-    }, 5000);
   }
 
+  // Observable data post method restapi
+  deleteData(user: User[]): void {
+
+    const usersObservable = this.userService.deleteData(user).pipe(takeUntil(this.componetDestroyed));
+    const usersObserverhttp = {
+      next: (data) => {
+        this.toastr.success(data.body.message, 'Deleted!');
+        this.readData();
+      },
+      error: err => console.error('Observer got an error: ' + err),
+      complete: () => console.log('Observer got a complete notification')
+    };
+    const subscription = usersObservable.subscribe(usersObserverhttp);
+  }
   // validate form
   setForm(user: any): void {
     // edit form
@@ -88,9 +114,7 @@ export class PostComponent implements OnInit {
   }
 
   removeUser(user: any): void {
-    // edit remove
-    this.users.splice(this.users.indexOf(this.users.find(x => user.id)), 1);
-    console.log('success');
+    this.deleteData(user);
   }
 
   onChange($event: any): void {
@@ -123,6 +147,8 @@ export class PostComponent implements OnInit {
 
   // getItems per Page
   getItems() {
-    return this.users ? this.users.slice((this.currentPage - 1) * Number(this.entry), Number(this.entry) + (this.currentPage - 1) * Number(this.entry)) : [];
+    return this.users ? this.users.slice(
+      (this.currentPage - 1) * Number(this.entry), Number(this.entry) + (this.currentPage - 1) * Number(this.entry)
+    ) : [];
   }
 }

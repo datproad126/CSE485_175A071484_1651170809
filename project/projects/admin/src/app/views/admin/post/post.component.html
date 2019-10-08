@@ -1,203 +1,219 @@
 <div class="card">
-   <div class="card-header">
-      <div class="row">
-         <div class="col-8 col-md-8">
-            <!-- <i class="fa fa-align-justify"></i> -->
-            <button type="button" class="btn btn-outline-primary" data-toggle="modal" (click)="createNewUser()">
-               <i class="fa fa-user-plus"></i>
-               Add
-               User</button>
-         </div>
-         <div class="col-4 col-md-4">
-            <div class="input-group">
-               <input type="text" id="input1-group2" name="input1-group2" class="form-control" placeholder="Username">
-               <span class="input-group-prepend">
-                  <button type="button" class="btn btn-outline-primary"><i class="fa fa-search"></i> Search</button>
-               </span>
-            </div>
-         </div>
+  <div class="card-header">
+    <div class="row">
+      <div class="col-8 col-md-8">
+        <!-- <i class="fa fa-align-justify"></i> -->
+        <button type="button" class="btn btn-outline-primary" data-toggle="modal" (click)="createNewUser()">
+          <i class="fa fa-user-plus"></i>
+          Add
+          User</button>
       </div>
-      <br>
-      <!-- list-user -->
-      <div class="row">
-         <!-- filter -->
-         <div class="col-sm-12 col-xl-10">
+      <div class="col-4 col-md-4">
+        <div class="input-group">
+          <input type="text" id="input1-group2" name="input1-group2" class="form-control" placeholder="Username">
+          <span class="input-group-prepend">
+            <button type="button" class="btn btn-outline-primary"><i class="fa fa-search"></i> Search</button>
+          </span>
+        </div>
+      </div>
+    </div>
+    <br>
+    <!-- list-user -->
+    <div class="row">
+      <!-- filter -->
+      <div class="col-sm-12 col-xl-10">
 
-            <label>
-               Filter by status:
-               <select class="form-control" id="filter" name="filter">
-                  <option value="0">Option #</option>
-                  <option value="1">Option #1</option>
-                  <option value="2">Option #2</option>
-                  <option value="3">Option #3</option>
-               </select>
-            </label>
+        <label>
+          Filter by status:
+          <select class="form-control" id="filter" name="filter">
+            <option value="0">Option #</option>
+            <option value="1">Option #1</option>
+            <option value="2">Option #2</option>
+            <option value="3">Option #3</option>
+          </select>
+        </label>
 
-         </div>
-         <div class="col-sm-12 col-xl-2 form-group">
-            <label style="position: absolute; right: 12px">
-               Show:
-               <select class="form-control" [(ngModel)]="entry">
-                  <option *ngFor="let entry of entries" [value]="entry.value"> {{ entry.name }} </option>
-               </select>
-               entries
-            </label>
-         </div>
-         <!-- <div class="col-8 col-md-8">
+      </div>
+      <div class="col-sm-12 col-xl-2 form-group">
+        <label style="position: absolute; right: 12px">
+          Show:
+          <select class="form-control" [(ngModel)]="entry">
+            <option *ngFor="let entry of entries" [value]="entry.value"> {{ entry.name }} </option>
+          </select>
+          entries
+        </label>
+      </div>
+      <!-- <div class="col-8 col-md-8">
             <button type="button" class="btn btn-outline-primary" data-toggle="modal" (click)="primaryModal.show()">
                <i class="fa fa-user-plus"></i>
                Add
                User</button>
          </div> -->
 
-      </div>
-   </div>
-   <div class="card-body">
-      <table class="table table-striped">
-         <thead>
-            <tr>
-               <th><input type="checkbox" [(ngModel)]="selectAll" (ngModelChange)="checkUncheckAll($event)"></th>
-               <th>ID</th>
-               <th>UserName</th>
-               <th>Display Name</th>
-               <th>Email</th>
-               <th>Password</th>
-               <th>Created Date</th>
-               <th>Role</th>
-               <th>Action</th>
-            </tr>
-         </thead>
-         <tbody>
-            <tr *ngFor="let user of getItems()">
-               <td><input type="checkbox" [(ngModel)]="itemSelected[user.id]" (ngModelChange)="onChange($event)"></td>
-               <td>{{ user.id }}</td>
-               <td>{{ user.username }}</td>
-               <td>{{ user.name }}</td>
-               <td>{{ user.email }}</td>
-               <td>{{ user.password }}</td>
-               <td>{{user.dateCreated | date:format }}</td>
-               <td>{{ user.role ? 'admin' : 'user'}}</td>
-               <td>
-                  <button type=" button" class="btn btn-sm btn-outline-danger" style="margin-right: 5px"
-                     (click)="removeUser(user)"><i class="fa fa-trash-o"></i> remove</button>
-                  <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal"
-                     (click)="editUser(user)" style="margin-right: 5px"><i class="fa fa-pencil"></i> edit</button>
-                  <!-- <button type="button" class="btn btn-sm btn-outline-success" style="margin-right: 5px"
+    </div>
+  </div>
+  <div class="card-body">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th><input type="checkbox" [(ngModel)]="selectAll" (ngModelChange)="checkUncheckAll($event)"></th>
+          <th>ID</th>
+          <th>UserName</th>
+          <th>Display Name</th>
+          <th>Email</th>
+          <th>Password</th>
+          <th>Created Date</th>
+          <th>Role</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of getItems()">
+          <td><input type="checkbox" [(ngModel)]="itemSelected[user.id]" (ngModelChange)="onChange($event)"></td>
+          <td>{{ user.id }}</td>
+          <td>{{ user.username }}</td>
+          <td>{{ user.name }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.password }}</td>
+          <td>{{user.dateCreated | date }}</td>
+          <td>{{ user.role ? 'admin' : 'user'}}</td>
+          <td>
+            <ng-template #popTemplateHtml>
+              <h6>Do you want to really deleted ?</h6>
+              <div style="margin: auto; text-align: center">
+                <button style="margin-right: 5px" type="button" class="btn btn-outline-danger"
+                  (click)="removeUser(user)">
+                  <i class="fa fa-trash-o"></i> Deleted
+                </button>
+                <button type="button" class="btn btn-outline-secondary" (click)="pop.hide()">
+                  <i class="fa fa-close"></i> Cancel
+                </button>
+              </div>
+            </ng-template>
+            <button type="button" class="btn btn-sm btn-outline-warning" style="margin-right: 5px"
+              [popover]="popTemplateHtml" popoverTitle="Record Delete Confirmation" placement="top"
+               #pop="bs-popover">
+              <i class="fa fa-trash-o"></i> remove
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal" (click)="editUser(user)"
+              style="margin-right: 5px">
+              <i class="fa fa-pencil"></i> edit
+            </button>
+            <!-- <button type="button" class="btn btn-sm btn-outline-success" style="margin-right: 5px"
                      (click)="viewUser(user)"><i class="fa fa-eye"></i> view</button> -->
-               </td>
-            </tr>
-         </tbody>
-      </table>
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
-   </div>
-   <div class="card-footer">
-      <div class="row">
-         <div class="col-sm col-md">
-            <p class="show-entries">Page: {{currentPage}} / {{numPages}} of {{numPages}} pages</p>
-         </div>
-         <div class="col-sm col-md-3">
-            <pagination [totalItems]="bigTotalItems" [(ngModel)]="currentPage" [maxSize]="maxSize" class="pagination"
-               previousText="&lsaquo;" nextText="&rsaquo;" firstText="&laquo;" lastText="&raquo;" [boundaryLinks]="true"
-               [rotate]="false" [itemsPerPage]="entry" (numPages)="numPages = $event"
-               (pageChanged)="pageChanged($event)">
-            </pagination>
-         </div>
+  </div>
+  <div class="card-footer">
+    <div class="row">
+      <div class="col-sm col-md">
+        <p class="show-entries">Page: {{currentPage}} / {{numPages}} of {{numPages}} pages</p>
       </div>
-   </div>
+      <div class="col-sm col-md-3">
+        <pagination [totalItems]="bigTotalItems" [(ngModel)]="currentPage" [maxSize]="maxSize" class="pagination"
+          previousText="&lsaquo;" nextText="&rsaquo;" firstText="&laquo;" lastText="&raquo;" [boundaryLinks]="true"
+          [rotate]="false" [itemsPerPage]="entry" (numPages)="numPages = $event" (pageChanged)="pageChanged($event)">
+        </pagination>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!--modal form add user-->
 <div bsModal #primaryModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-   aria-hidden="true">
-   <div class="modal-dialog modal-primary" role="document">
-      <div class="modal-content">
-         <div class="modal-header">
-            <h4 class="modal-title">
-               {{ isEdit ? 'Edit account' : 'Add account' }}
-            </h4>
-            <button type="button" class="close" (click)="primaryModal.hide()" aria-label="Close">
-               <span aria-hidden="true">&times;</span>
-            </button>
-         </div>
-         <div class="modal-body">
+  aria-hidden="true">
+  <div class="modal-dialog modal-primary" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">
+          {{ isEdit ? 'Edit account' : 'Add account' }}
+        </h4>
+        <button type="button" class="close" (click)="primaryModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
 
-            <form [formGroup]="editForm" (ngSubmit)='onSubmit()'>
-               <div class="row">
-                  <div class="form-group col">
+        <form [formGroup]="editForm" (ngSubmit)='onSubmit()'>
+          <div class="row">
+            <div class="form-group col">
 
-                     <label for="UserName">User Name:</label>
-                     <input type="text" formControlName="UserName" placeholder="User Name" name="UserName"
-                        class="form-control" [ngClass]="{'is-invalid': submitted && f.UserName.errors }" id="UserName">
-                     <div *ngIf="submitted && f.firstName.errors" class="invalid-feedback">
+              <label for="UserName">User Name:</label>
+              <input type="text" formControlName="UserName" placeholder="User Name" name="UserName" class="form-control"
+                [ngClass]="{'is-invalid': submitted }" id="UserName">
+              <!-- <div *ngIf="submitted && f.firstName.errors" class="invalid-feedback">
                         <div *ngIf="f.firstName.errors.required">First Name is required</div>
-                     </div>
-                  </div>
+                     </div> -->
+            </div>
 
-                  <div class="form-group col">
-                     <label for="DisplayName">Display Name:</label>
-                     <input type="text" formControlName="DisplayName" placeholder="Display Name" name="DisplayName"
-                        [ngClass]="{'is-invalid': submitted && f.DisplayName.errors }" class="form-control"
-                        id="DisplayName">
-                     <div *ngIf="submitted && f.lastName.errors" class="invalid-feedback">
+            <div class="form-group col">
+              <label for="DisplayName">Display Name:</label>
+              <input type="text" formControlName="DisplayName" placeholder="Display Name" name="DisplayName"
+                [ngClass]="{'is-invalid': submitted }" class="form-control" id="DisplayName">
+              <!-- <div *ngIf="submitted && f.lastName.errors" class="invalid-feedback">
                         <div *ngIf="f.lastName.errors.required">Last Name is required</div>
-                     </div>
-                  </div>
-               </div>
+                     </div> -->
+            </div>
+          </div>
 
-               <div class="form-group">
-                  <label for="Email">Email:</label>
-                  <input type="text" formControlName="Email" placeholder="Email" name="Email" class="form-control"
-                     [ngClass]="{ 'is-invalid': submitted && f.Password.errors }" id="Password">
-                  <div *ngIf="submitted && f.Email.errors" class="invalid-feedback">
+          <div class="form-group">
+            <label for="Email">Email:</label>
+            <input type="text" formControlName="Email" placeholder="Email" name="Email" class="form-control"
+              [ngClass]="{ 'is-invalid': submitted }" id="Password">
+            <!-- <div *ngIf="submitted && f.Email.errors" class="invalid-feedback">
                      <div *ngIf="f.Email.errors.required">Email is required</div>
                      <div *ngIf="f.Email.errors.minlength">Email must be at least 6 characters</div>
-                  </div>
-               </div>
+                  </div> -->
+          </div>
 
-               <div class="form-group">
-                  <label for="Password">Password:</label>
-                  <input type="password" formControlName="Password" placeholder="Password" name="Password"
-                     class="form-control" [ngClass]="{ 'is-invalid': submitted && f.Password.errors }" id="Password">
-                  <div *ngIf="submitted && f.password.errors" class="invalid-feedback">
+          <div class="form-group">
+            <label for="Password">Password:</label>
+            <input type="password" formControlName="Password" placeholder="Password" name="Password"
+              class="form-control" [ngClass]="{ 'is-invalid': submitted  }" id="Password">
+            <!-- <div *ngIf="submitted && f.password.errors" class="invalid-feedback">
                      <div *ngIf="f.password.errors.required">Password is required</div>
                      <div *ngIf="f.password.errors.minlength">Password must be at least 6 characters</div>
-                  </div>
-               </div>
+                  </div> -->
+          </div>
 
-               <div class="form-group">
-                  <label for="Confirm">Confirm:</label>
-                  <input type="password" formControlName="Confirm" placeholder="Confirm" name="Confirm"
-                     class="form-control" [ngClass]="{ 'is-invalid': submitted && f.Password.errors }" id="Confirm">
-                  <div *ngIf="submitted && f.confirmPassword.errors" class="invalid-feedback">
+          <div class="form-group">
+            <label for="Confirm">Confirm:</label>
+            <input type="password" formControlName="Confirm" placeholder="Confirm" name="Confirm" class="form-control"
+              [ngClass]="{ 'is-invalid': submitted  }" id="Confirm">
+            <!-- <div *ngIf="submitted && f.confirmPassword.errors" class="invalid-feedback">
                      <div *ngIf="f.confirmPassword.errors.required">Confirm Password is required</div>
                      <div *ngIf="f.confirmPassword.errors.mustMatch">Passwords must match</div>
-                  </div>
-               </div>
+                  </div> -->
 
-               <div class="form-group">
-                  <label for="Role">Role:</label>
-                  <select id="Role" name="Role" class="form-control">
-                     <option value="0">Admin</option>
-                     <option value="1">user</option>
-                  </select>
-               </div>
-            </form>
-         </div>
-         <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" (click)="primaryModal.hide()"><i class="fa fa-remove"></i>
-               Close</button>
-            <button type="submit" class="btn btn-primary">
-               <ng-container *ngIf="!isEdit; else elseTemplate">
-                  <i class="fa fa-user-plus"></i> Add User
-               </ng-container>
-               <ng-template #elseTemplate>
-                  <i class="fa fa-pencil"></i> Edit User
-               </ng-template>
-            </button>
+          </div>
 
-         </div>
-      </div><!-- /.modal-content -->
-   </div>
-   <!-- /.modal-dialog-->
+          <div class="form-group">
+            <label for="Role">Role:</label>
+            <select id="Role" name="Role" class="form-control">
+              <option value="0">Admin</option>
+              <option value="1">user</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="primaryModal.hide()"><i class="fa fa-remove"></i>
+          Close</button>
+        <button type="submit" class="btn btn-primary">
+          <ng-container *ngIf="!isEdit; else elseTemplate">
+            <i class="fa fa-user-plus"></i> Add User
+          </ng-container>
+          <ng-template #elseTemplate>
+            <i class="fa fa-pencil"></i> Edit User
+          </ng-template>
+        </button>
+
+      </div>
+    </div><!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog-->
 </div>
 <!-- /.modal -->

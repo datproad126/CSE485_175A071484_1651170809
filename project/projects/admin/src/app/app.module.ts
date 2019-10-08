@@ -40,8 +40,10 @@ import { AppRoutingModule } from './app.routing';
 // Import 3rd party components
 import { ChartsModule } from 'ng2-charts';
 import { PostComponent } from './views/admin/post/post.component';
-import { ModalModule, AlertModule, BsDropdownModule, TabsModule, PaginationModule } from 'ngx-bootstrap';
+import { ModalModule, AlertModule, BsDropdownModule, TabsModule, PaginationModule, PopoverModule } from 'ngx-bootstrap';
 import { HttpClientModule } from '@angular/common/http';
+import { ToastrModule } from 'ngx-toastr';
+import { timeout } from 'q';
 
 
 @NgModule({
@@ -63,7 +65,13 @@ import { HttpClientModule } from '@angular/common/http';
     FormsModule,
     ReactiveFormsModule,
     PaginationModule.forRoot(),
-    HttpClientModule
+    HttpClientModule,
+    PopoverModule.forRoot(),
+    ToastrModule.forRoot({
+      timeOut: 1250,
+      positionClass: 'toast-top-right',
+      preventDuplicates: false,
+    }),
   ],
   declarations: [
     AppComponent,
