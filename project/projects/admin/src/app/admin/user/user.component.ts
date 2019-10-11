@@ -2,20 +2,19 @@ import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 // import { controllers } from 'chart.js';
-import { UserService } from '../../../services/user.service';
-import { User } from '../../../model/user';
+import { UserService } from '../../services/user.service';
+import { User } from '../../models/user';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { PopoverDirective } from 'ngx-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 
-
 @Component({
-  selector: 'app-post',
-  templateUrl: './post.component.html',
-  styleUrls: ['./post.component.css']
+  selector: 'app-user',
+  templateUrl: './user.component.html',
+  styleUrls: ['./user.component.css']
 })
-export class PostComponent implements OnInit, OnDestroy {
+export class UserComponent implements OnInit, OnDestroy {
   private componetDestroyed: Subject<any> = new Subject();
 
   // test observerble

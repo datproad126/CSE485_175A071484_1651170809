@@ -1,8 +1,10 @@
+
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse, HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
-import { User } from '../model/user';
+import { User } from '../models/user';
 import { Observable, throwError } from 'rxjs';
 import { catchError, retry, tap, map } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 // declare http header
 const httpOptions = {
@@ -15,13 +17,10 @@ const httpOptions = {
 })
 
 export class UserService {
-  // declare api server
-  private PHP_API_SERVER = 'http://18.39.105.26:8080/api/user';
-
   constructor(private http: HttpClient) { }
   // get all user by httpclient
   readUserData(): Observable<User[]> {
-    return this.http.get<any>(`${this.PHP_API_SERVER}/read.php`, httpOptions)
+    return this.http.get<any>(`${environment.PHP_API_SERVER}/read.php`, httpOptions)
       .pipe(
         retry(3),
         catchError(this.handleError),
@@ -29,7 +28,7 @@ export class UserService {
   }
   // delete user
   deleteData(user: User[]): Observable<HttpResponse<any>> {
-    return this.http.post<any>(`${this.PHP_API_SERVER}/delete.php`, user, { observe: 'response' })
+    return this.http.post<any>(`${environment.PHP_API_SERVER}/delete.php`, user, { observe: 'response' })
       .pipe(
         catchError(this.handleError)
       );
