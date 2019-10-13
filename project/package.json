@@ -41,6 +41,7 @@
     "ngx-bootstrap": "^5.0.0",
     "ngx-perfect-scrollbar": "^8.0.0",
     "ngx-toastr": "^11.1.0",
+    "ngx-ui-loader": "^8.0.0",
     "popper.js": "^1.15.0",
     "rxjs": "^6.5.2",
     "simple-line-icons": "^2.4.1",

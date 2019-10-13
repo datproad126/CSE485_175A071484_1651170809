@@ -5,8 +5,9 @@ header("Content-Type: application/json");
 header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
 
 // include database and object files
+
 require_once('../conf/settings.config.php');
-require_once('user.php');
+require_once('modal_user.php');
 
 try {
    $user = new user($localhost);
@@ -19,13 +20,13 @@ try {
       foreach ($rows as $key => $row) {
          extract($row);
          $user_item = array(
-            "id" => $id,
+            "id" => intval($id),
             "username" => $username,
             "password" => $password,
             "name" => $display_name,
             "email" => $email,
-            "dateCreated" => $registered_date,
-            "role"  => $role
+            "dateCreated" => date($registered_date),
+            "role"  => intval($role)
          );
          array_push($users_arr["user"], $user_item);
       }

@@ -19,9 +19,9 @@ import { DefaultLayoutComponent } from './containers';
 
 import { P404Component } from './views/error/404.component';
 import { P500Component } from './views/error/500.component';
-// import { LoginComponent } from './login/login.component';
+import { LoginComponent } from './login/login.component';
 // import { RegisterComponent } from './register/register.component';
-import { LoginComponent } from './views/login/login.component';
+// import { LoginComponent } from './views/login/login.component';
 import { RegisterComponent } from './views/register/register.component';
 
 const APP_CONTAINERS = [
@@ -46,6 +46,7 @@ import { fakeBackendProvider } from './helpers/fake-backend';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ErrorInterceptor } from './helpers/error.interceptor';
 import { JwtInterceptor } from './helpers/JWT.interceptor';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   imports: [
@@ -61,7 +62,9 @@ import { JwtInterceptor } from './helpers/JWT.interceptor';
     BsDropdownModule.forRoot(),
     TabsModule.forRoot(),
     ChartsModule,
-    AdminModule
+    AdminModule,
+    FormsModule,
+    ReactiveFormsModule
   ],
   declarations: [
     AppComponent,
@@ -71,21 +74,23 @@ import { JwtInterceptor } from './helpers/JWT.interceptor';
     LoginComponent,
     RegisterComponent,
   ],
-  providers: [{
-    provide: LocationStrategy,
-    useClass: PathLocationStrategy,
-  },
-  {
-    provide: HTTP_INTERCEPTORS,
-    useClass: JwtInterceptor, multi: true
-  },
-  {
-    provide: HTTP_INTERCEPTORS,
-    useClass: ErrorInterceptor,
-    multi: true
-  },
+  providers: [
+    {
+      provide: LocationStrategy,
+      useClass: PathLocationStrategy,
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: JwtInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ErrorInterceptor,
+      multi: true
+    },
     // provider used to create fake backend
-    // fakeBackendProvider
+    fakeBackendProvider
   ],
   bootstrap: [AppComponent]
 })

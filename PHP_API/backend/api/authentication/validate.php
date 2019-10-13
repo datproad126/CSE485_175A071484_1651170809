@@ -1,14 +1,14 @@
 <?php
 session_start();
 // required headers
-header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin: http://localhost/rest-api-authentication-example/");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 // files for decoding jwt will be here
-// required to encode json web token
+// required to decode jwt
 include_once '../conf/core.php';
 include_once '../libs/php-jwt/src/BeforeValidException.php';
 include_once '../libs/php-jwt/src/ExpiredException.php';
@@ -17,15 +17,7 @@ include_once '../libs/php-jwt/src/JWT.php';
 
 use \Firebase\JWT\JWT;
 
-// database connection will be here
-// files needed to connect to database
-include_once '../conf/settings.config.php';
-include_once '../user/modal_user.php';
-
-// get database connection and instantiate product object
-$user = new user($localhost);
-
-// check email existence here
+// retrieve gieve jwt here
 // get posted data
 $data = json_decode(file_get_contents("php://input"));
 
@@ -38,21 +30,27 @@ if ($jwt) {
 
    // if decode succeed, show user details
    try {
-
       // decode jwt
       $decoded = JWT::decode($jwt, $key, array('HS256'));
 
-      // set user property values here
+      // set response code
+      http_response_code(200);
+
+      // show user details
+      echo json_encode(array(
+         "message" => "Access granted.",
+         "data" => $decoded->data
+      ));
    }
 
-   // catch failed decoding will be here
+   // catch will be here
    // if decode fails, it means jwt is invalid
    catch (Exception $e) {
 
       // set response code
       http_response_code(401);
 
-      // show error message
+      // tell the user access denied  & show error message
       echo json_encode(array(
          "message" => "Access denied.",
          "error" => $e->getMessage()
@@ -60,7 +58,7 @@ if ($jwt) {
    }
 }
 
-// error message if jwt is empty will be here
+// error if jwt is empty will be here
 // show error message if jwt is empty
 else{
  
@@ -70,24 +68,4 @@ else{
    // tell the user access denied
    echo json_encode(array("message" => "Access denied."));
 }
-// set user property values
-$user->username = $data->username;
-$user->display_name = $data->display_name;
-$user->email = $data->email;
-$user->password = $data->password;
-$user->id = $decoded->data->id;
- 
-// update user will be here
-// update the user record
-if($user->update()){
-   // regenerate jwt will be here
-}
-
-// message if unable to update user
-else{
-   // set response code
-   http_response_code(401);
-
-   // show error message
-   echo json_encode(array("message" => "Unable to update user."));
 ?>

@@ -246,24 +246,28 @@ export const navItems: NavData[] = [
       {
         name: 'Login',
         url: '/login',
-        icon: 'icon-star'
+        icon: 'icon-star',
+        attributes: { disabled: true },
       },
       {
         name: 'Register',
         url: '/register',
-        icon: 'icon-star'
+        icon: 'icon-star',
+        attributes: { disabled: true },
       },
       {
         name: 'Error 404',
         url: '/404',
-        icon: 'icon-star'
+        icon: 'icon-star',
+        attributes: { disabled: true },
       },
       {
         name: 'Error 500',
         url: '/500',
-        icon: 'icon-star'
+        icon: 'icon-star',
+        attributes: { disabled: true },
       }
-    ]
+    ],
   },
   {
     name: 'Disabled',

@@ -3,7 +3,7 @@ require_once('../conf/DBConnection.php');
 class user extends DBConnection
 {
    // table username
-   private $table = "user";
+   private $table = "`user`";
 
    // object properties
    public $id;
@@ -57,32 +57,87 @@ class user extends DBConnection
       }
    }
    // create user
+   // create new user record
    function create()
    {
+      try {
+         // insert query
+         $query = "INSERT INTO " . $this->table . "(`username`, `password`, `display_name`, `email`)
+         VALUES ( :username, :password, :display_name, :email)";
+         // prepare the query
+         $stmt = $this->dbc->prepare($query);
 
-      // query to insert record
-      $query = "INSERT INTO" . $this->table .
-         " SET username=:username, password=:password, display_name=:display_name, email=:email";
+         // sanitize
+         $this->username = htmlspecialchars(strip_tags($this->username));
+         $this->password = htmlspecialchars(strip_tags($this->password));
+         $this->display_name = htmlspecialchars(strip_tags($this->display_name));
+         $this->email = htmlspecialchars(strip_tags($this->email));
 
-      // prepare query
-      $stmt = $this->dbc->query($query);
+         // bind the values
+         $stmt->bindValue(':username', $this->username, PDO::PARAM_STR);
+         $stmt->bindValue(':display_name', $this->display_name, PDO::PARAM_STR);
+         $stmt->bindValue(':email', $this->email, PDO::PARAM_STR);
+
+         // hash the password before saving to database
+         $password_hash = password_hash($this->password, PASSWORD_BCRYPT);
+         $stmt->bindValue(':password', $password_hash, PDO::PARAM_STR);
+         $check = $stmt->execute();
+         // execute the query, also check if query was successful
+         if ($check) {
+            return true;
+         }
+
+         return false;
+      } catch (PDOException $e) {
+         echo "There is some problem: " . $e->getMessage();
+      }
+   }
+
+   // emailExists() method will be here
+   // check if given email exist in the database
+   function emailOrUserExists()
+   {
+      // query to check if email exists
+      $query = "SELECT `id`, `username`, `display_name`, `password`, `email`
+           FROM " . $this->table . "
+           WHERE (`email` = ? OR `username` = ?)
+           LIMIT 0,1";
+
+      // prepare the query
+      $stmt = $this->dbc->prepare($query);
 
       // sanitize
-      $this->username = htmlspecialchars(strip_tags($this->username));
-      $this->password = htmlspecialchars(strip_tags(password_hash($this->password, PASSWORD_DEFAULT)));
-      $this->display_name = htmlspecialchars(strip_tags($this->display_name));
       $this->email = htmlspecialchars(strip_tags($this->email));
+      $this->username = htmlspecialchars(strip_tags($this->username));
 
-      // bind values
-      $stmt->bindParam(":username", $this->username);
-      $stmt->bindParam(":password", $this->password);
-      $stmt->bindParam(":display_name", $this->display_name);
-      $stmt->bindParam(":email", $this->email);
+      // bind given email value
+      $stmt->bindValue(1, $this->email);
+      $stmt->bindValue(2, $this->username);
 
-      // execute query
-      if ($stmt->execute()) {
+      // execute the query
+      $stmt->execute();
+
+      // get number of rows
+      $num = $stmt->rowCount();
+
+      // if email exists, assign values to object properties for easy access and use for php sessions
+      if ($num > 0) {
+
+         // get record details / values
+         $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+         // assign values to object properties
+         $this->id = $row['id'];
+         $this->username = $row['username'];
+         $this->name = $row['display_name'];
+         $this->password = $row['password'];
+         $this->email = $row['email'];
+
+         // return true because email exists in the database
          return true;
       }
+
+      // return false if email does not exist in the database
       return false;
    }
    // update user
