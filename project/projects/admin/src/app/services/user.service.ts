@@ -1,10 +1,12 @@
+
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse, HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
-import { User } from '../model/user';
+import { User } from '../models/user';
 import { Observable, throwError } from 'rxjs';
-import { catchError, retry, tap, map } from 'rxjs/operators';
+import { catchError, retry } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
-// declare http header
+
 const httpOptions = {
   headers: new HttpHeaders({
     'Content-Type': 'application/json'
@@ -15,26 +17,42 @@ const httpOptions = {
 })
 
 export class UserService {
-  // declare api server
-  private PHP_API_SERVER = 'http://18.39.105.26:8080/api/user';
 
   constructor(private http: HttpClient) { }
-  // get all user by httpclient
+
+  /** GET: get the user from the server */
   readUserData(): Observable<User[]> {
-    return this.http.get<any>(`${this.PHP_API_SERVER}/read.php`, httpOptions)
+    const url = `${environment.PHP_API_SERVER}/read.php`; // READ api/user/read.php
+    return this.http.get<User[]>(url, httpOptions)
       .pipe(
         retry(3),
-        catchError(this.handleError),
+        catchError(this.handleError)
       );
   }
-  // delete user
-  deleteData(user: User[]): Observable<HttpResponse<any>> {
-    return this.http.post<any>(`${this.PHP_API_SERVER}/delete.php`, user, { observe: 'response' })
+  /** DELETE: delete the user from the server */
+  deleteData(user: User[]): Observable<HttpResponse<User[]>> {
+    const url = `${environment.PHP_API_SERVER}/delete.php`; // DELETE api/user
+    return this.http.post<User[]>(url, user, { observe: 'response' })
       .pipe(
         catchError(this.handleError)
       );
   }
-  // error handle here
+
+  /** CREATE: delete the user from the server */
+  createUser(user: User[]): Observable<HttpResponse<User[]>> {
+    const observe = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json'
+      }),
+      observe: 'response'
+    };
+    const url = `${environment.PHP_API_SERVER}/delete.php`; // DELETE api/user
+    return this.http.post<HttpResponse<User[]>>(url, user, httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+  /** Error: show error messages */
   private handleError(error: HttpErrorResponse) {
     if (error.error instanceof ErrorEvent) {
       // A client-side or network error occurred. Handle it accordingly.

@@ -41,6 +41,25 @@ export const navItems: NavData[] = [
   },
   {
     title: true,
+    name: 'Admin'
+  },
+  {
+    name: 'post',
+    url: '/admin/post',
+    icon: 'icon-star'
+  },
+  {
+    name: 'category',
+    url: '/admin/category',
+    icon: 'icon-star'
+  },
+  {
+    name: 'user',
+    url: '/admin/user',
+    icon: 'icon-star'
+  },
+  {
+    title: true,
     name: 'Theme'
   },
   {
@@ -52,25 +71,6 @@ export const navItems: NavData[] = [
     name: 'Typography',
     url: '/theme/typography',
     icon: 'icon-pencil'
-  },
-  {
-    title: true,
-    name: 'admin'
-  },
-  {
-    name: 'post',
-    url: '/post',
-    icon: 'icon-star'
-  },
-  {
-    name: 'category',
-    url: '/category',
-    icon: 'icon-star'
-  },
-  {
-    name: 'user',
-    url: '/user',
-    icon: 'icon-star'
   },
   {
     title: true,
@@ -246,24 +246,28 @@ export const navItems: NavData[] = [
       {
         name: 'Login',
         url: '/login',
-        icon: 'icon-star'
+        icon: 'icon-star',
+        attributes: { disabled: true },
       },
       {
         name: 'Register',
         url: '/register',
-        icon: 'icon-star'
+        icon: 'icon-star',
+        attributes: { disabled: true },
       },
       {
         name: 'Error 404',
         url: '/404',
-        icon: 'icon-star'
+        icon: 'icon-star',
+        attributes: { disabled: true },
       },
       {
         name: 'Error 500',
         url: '/500',
-        icon: 'icon-star'
+        icon: 'icon-star',
+        attributes: { disabled: true },
       }
-    ]
+    ],
   },
   {
     name: 'Disabled',

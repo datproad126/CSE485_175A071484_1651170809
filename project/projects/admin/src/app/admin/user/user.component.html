@@ -90,9 +90,8 @@
                 </button>
               </div>
             </ng-template>
-            <button type="button" class="btn btn-sm btn-outline-warning" style="margin-right: 5px"
-              [popover]="popTemplateHtml" popoverTitle="Record Delete Confirmation" placement="top"
-               #pop="bs-popover">
+            <button type="button" class="btn btn-sm btn-outline-danger" style="margin-right: 5px"
+              [popover]="popTemplateHtml" popoverTitle="Record Delete Confirmation" placement="top" #pop="bs-popover">
               <i class="fa fa-trash-o"></i> remove
             </button>
             <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal" (click)="editUser(user)"
@@ -123,7 +122,7 @@
 </div>
 
 <!--modal form add user-->
-<div bsModal #primaryModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+<div bsModal #userModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
   aria-hidden="true">
   <div class="modal-dialog modal-primary" role="document">
     <div class="modal-content">
@@ -131,31 +130,31 @@
         <h4 class="modal-title">
           {{ isEdit ? 'Edit account' : 'Add account' }}
         </h4>
-        <button type="button" class="close" (click)="primaryModal.hide()" aria-label="Close">
+        <button type="button" class="close" (click)="userModal.hide()" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
 
-        <form [formGroup]="editForm" (ngSubmit)='onSubmit()'>
+        <form [formGroup]="userForm" (ngSubmit)='onSubmit()'>
           <div class="row">
             <div class="form-group col">
 
               <label for="UserName">User Name:</label>
               <input type="text" formControlName="UserName" placeholder="User Name" name="UserName" class="form-control"
                 [ngClass]="{'is-invalid': submitted }" id="UserName">
-              <!-- <div *ngIf="submitted && f.firstName.errors" class="invalid-feedback">
-                        <div *ngIf="f.firstName.errors.required">First Name is required</div>
-                     </div> -->
+              <div *ngIf="submitted && !!userfbc.UserName.errors" class="invalid-feedback">
+                <div *ngIf="!!userfbc.UserName.errors.required">UserName is required</div>
+              </div>
             </div>
 
             <div class="form-group col">
               <label for="DisplayName">Display Name:</label>
               <input type="text" formControlName="DisplayName" placeholder="Display Name" name="DisplayName"
                 [ngClass]="{'is-invalid': submitted }" class="form-control" id="DisplayName">
-              <!-- <div *ngIf="submitted && f.lastName.errors" class="invalid-feedback">
-                        <div *ngIf="f.lastName.errors.required">Last Name is required</div>
-                     </div> -->
+              <div *ngIf="submitted && !!userfbc.DisplayName.errors" class="invalid-feedback">
+                <div *ngIf="!!userfbc.DisplayName.errors.required">DisplayName is required</div>
+              </div>
             </div>
           </div>
 
@@ -163,30 +162,30 @@
             <label for="Email">Email:</label>
             <input type="text" formControlName="Email" placeholder="Email" name="Email" class="form-control"
               [ngClass]="{ 'is-invalid': submitted }" id="Password">
-            <!-- <div *ngIf="submitted && f.Email.errors" class="invalid-feedback">
-                     <div *ngIf="f.Email.errors.required">Email is required</div>
-                     <div *ngIf="f.Email.errors.minlength">Email must be at least 6 characters</div>
-                  </div> -->
+            <div *ngIf="submitted && !!userfbc.Email.errors" class="invalid-feedback">
+              <div *ngIf="!!userfbc.Email.errors.required">Email is required</div>
+              <div *ngIf="!!userfbc.Email.errors.minlength">Email must be at least 6 characters</div>
+            </div>
           </div>
 
           <div class="form-group">
             <label for="Password">Password:</label>
             <input type="password" formControlName="Password" placeholder="Password" name="Password"
               class="form-control" [ngClass]="{ 'is-invalid': submitted  }" id="Password">
-            <!-- <div *ngIf="submitted && f.password.errors" class="invalid-feedback">
-                     <div *ngIf="f.password.errors.required">Password is required</div>
-                     <div *ngIf="f.password.errors.minlength">Password must be at least 6 characters</div>
-                  </div> -->
+            <div *ngIf="submitted && !!userfbc.Password.errors" class="invalid-feedback">
+              <div *ngIf="!!userfbc.Password.errors.required">Password is required</div>
+              <div *ngIf="!!userfbc.Password.errors.minlength">Password must be at least 6 characters</div>
+            </div>
           </div>
 
           <div class="form-group">
             <label for="Confirm">Confirm:</label>
             <input type="password" formControlName="Confirm" placeholder="Confirm" name="Confirm" class="form-control"
               [ngClass]="{ 'is-invalid': submitted  }" id="Confirm">
-            <!-- <div *ngIf="submitted && f.confirmPassword.errors" class="invalid-feedback">
-                     <div *ngIf="f.confirmPassword.errors.required">Confirm Password is required</div>
-                     <div *ngIf="f.confirmPassword.errors.mustMatch">Passwords must match</div>
-                  </div> -->
+            <div *ngIf="submitted && !!userfbc.Confirm.errors" class="invalid-feedback">
+              <div *ngIf="!!userfbc.Confirm.errors.required">Confirm Password is required</div>
+              <div *ngIf="!!userfbc.Confirm.errors.mustMatch">Passwords must match</div>
+            </div>
 
           </div>
 
@@ -200,7 +199,7 @@
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="primaryModal.hide()"><i class="fa fa-remove"></i>
+        <button type="button" class="btn btn-secondary" (click)="userModal.hide()"><i class="fa fa-remove"></i>
           Close</button>
         <button type="submit" class="btn btn-primary">
           <ng-container *ngIf="!isEdit; else elseTemplate">

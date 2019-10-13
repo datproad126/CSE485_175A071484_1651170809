@@ -9,6 +9,12 @@
     "paths": {
       "@angular/*": [
         "../node_modules/@angular/*"
+      ],
+      "@app/*": [
+        "app/*"
+      ],
+      "@environment/*": [
+        "environments/*"
       ]
     }
   },
