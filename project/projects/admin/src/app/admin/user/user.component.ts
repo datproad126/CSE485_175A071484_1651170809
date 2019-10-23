@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { ModalDirective } from 'ngx-bootstrap/modal';
-
+import { Router, ActivatedRoute } from '@angular/router';
 // import { controllers } from 'chart.js';
 import { UserService } from '../../services/user.service';
 import { User } from '../../models/user';
@@ -10,7 +10,7 @@ import { takeUntil } from 'rxjs/operators';
 import { PopoverDirective } from 'ngx-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { MustMatchpwd } from '../../helpers/MustMatchpwd';
-import { Role } from '../../models/Role';
+// import { Role } from '../../models/Role';
 
 @Component({
   selector: 'app-user',
@@ -23,6 +23,7 @@ export class UserComponent implements OnInit, OnDestroy {
   users: User[];
   user: any;
   destroy$: Subject<boolean> = new Subject<boolean>();
+  returnUrl: string;
   // checkbox
   itemSelected: any[] = [];
   selectAll: boolean;
@@ -46,7 +47,14 @@ export class UserComponent implements OnInit, OnDestroy {
 
   @ViewChild('userModal', { static: true }) userModal: ModalDirective;
   @ViewChild('pop', { static: true }) pop: PopoverDirective;
-  constructor(private fb: FormBuilder, private userService: UserService, private toastr: ToastrService) { }
+  constructor(
+    private fb: FormBuilder,
+    private userService: UserService,
+    private toastr: ToastrService,
+    private route: ActivatedRoute,
+    private router: Router,
+  ) {
+  }
 
   ngOnInit() {
 
@@ -83,11 +91,11 @@ export class UserComponent implements OnInit, OnDestroy {
       this.userForm.patchValue({});
     } else {
       this.userForm.patchValue({
-        UserName: [user.username, Validators.required],
-        Password: [user.password, Validators.required],
-        DisplayName: [user.name, Validators.required],
-        Email: [user.email, [Validators.required, Validators.email]],
-        Role: [user.role, Validators.required]
+        UserName: user.username,
+        Password: user.password,
+        DisplayName: user.name,
+        Email: user.email,
+        Role: user.role
       });
     }
   }
@@ -109,6 +117,7 @@ export class UserComponent implements OnInit, OnDestroy {
   }
 
   editUser(user: User): void {
+    console.log(this.userfbc);
     this.setForm(user);
     this.isEdit = true;
     this.userModal.show();
@@ -171,7 +180,7 @@ export class UserComponent implements OnInit, OnDestroy {
     const usersObservable = this.userService.deleteData(user).pipe(takeUntil(this.destroy$));
     const usersObserverhttp = {
       next: (data) => {
-        this.toastr.success(data.body.message, 'Deleted!');
+        this.toastr.success(data.message, 'Deleted!');
         this.readData();
       },
       error: err => console.error('Observer got an error: ' + err),
@@ -205,7 +214,24 @@ export class UserComponent implements OnInit, OnDestroy {
     };
     const subscription = usersObservable.subscribe(usersObserverhttp);
   }
-
+  pagination(page: number, entry: number): void {
+    const usersObservable = this.userService.pagination(page, entry).pipe(takeUntil(this.destroy$));
+    const usersObserverhttp = {
+      next: (data) => {
+        this.users = data.records;
+        data.paging.pages.forEach(element => {
+          if (element.current_page == 'yes') {
+            this.currentPage = element.page;
+            // handle routing crisis angular
+            this.router.navigate(['../', data.paging.pages], { relativeTo: this.route });
+          }
+        });
+      },
+      error: err => console.error('Observer got an error: ' + err),
+      complete: () => console.log('Observer got a complete notification')
+    };
+    const subscription = usersObservable.subscribe(usersObserverhttp);
+  }
   onChange($event: any): void {
     console.log('event', $event);
   }
@@ -221,24 +247,17 @@ export class UserComponent implements OnInit, OnDestroy {
   }
   // pagnation function
   pageChanged(event: any): void {
-    // this.configPagination.currentPage = event.page;
-    // event.itemsPerPage = Number(this.entry);
+    this.pagination(Number(event.page), Number(this.entry));
   }
 
   // getItems per Page
   getItems() {
-    return this.users ? this.users.slice(
-      (this.currentPage - 1) * Number(this.entry), Number(this.entry) + (this.currentPage - 1) * Number(this.entry)
-    ) : [];
+    // get the users success
+    return this.users ? this.users : [];
+    // return this.users ? this.users.slice(
+    //   (this.currentPage - 1) * Number(this.entry), Number(this.entry) + (this.currentPage - 1) * Number(this.entry)
+    // ) : [];
   }
 }
 // problems :
-//    1.pagination vẫn chưa hoàn chỉnh khi thêm nhiều bản ghi mới và xóa đi nhiều bản ghi ko cập nhật luôn
-//    2.delete bị lỗi xóa theo index vẫn chưa khắc phục
-//    3.form validation vẫn chưa xong
-//    4.thiếu một vài chức năng filter cho người quản trị
-//    JWT authentication
-//    auth guard
-//    http error interceptor
-//    fake backend provider
-//    JWT interceptor
+// routing crisis and _nav must be handle in tonight

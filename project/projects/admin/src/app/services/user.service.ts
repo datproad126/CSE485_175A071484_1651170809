@@ -20,8 +20,8 @@ const httpOptions = {
 export class UserService {
 
   constructor(private http: HttpClient, private authenticationService: AuthenticationService) {
-    const currentUser = this.authenticationService.currentUserValue;
-    httpOptions.headers = httpOptions.headers.set('Authorization', 'Bearer: ' + currentUser.token);
+    // const currentUser = this.authenticationService.currentUserValue;
+    // httpOptions.headers = httpOptions.headers.set('Authorization', 'Bearer: ' + currentUser.token);
   }
 
   /** GET: get the user from the server */
@@ -55,6 +55,14 @@ export class UserService {
   updateUser(user: User): Observable<User[]> {
     const url = `${environment.PHP_API_SERVER}/authenticate/update.php`; // UPDATE api/user
     return this.http.post<User[]>(url, user, httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+  /** PAGINATION: pagination the user from the server */
+  pagination(page: number, entry: number): Observable<any> {
+    const url = `${environment.PHP_API_SERVER}/user/pagination.php`; // UPDATE api/user
+    return this.http.post<any>(url, { page, entry }, httpOptions)
       .pipe(
         catchError(this.handleError)
       );

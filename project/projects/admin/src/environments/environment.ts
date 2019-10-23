@@ -5,6 +5,6 @@
 
 export const environment = {
   production: false,
-  PHP_API_SERVER: 'http://cse485api.com/api',
-  // PHP_API_SERVER: 'http://192.168.1.45:8080/api',
+  // PHP_API_SERVER: 'http://cse485api.com/api',
+  PHP_API_SERVER: 'http://18.39.105.26:8080/api',
 };

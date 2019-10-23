@@ -67,7 +67,7 @@
           <th>Action</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody class="">
         <tr *ngFor="let user of getItems()">
           <td><input type="checkbox" [(ngModel)]="itemSelected[user.id]" (ngModelChange)="onChange($event)"></td>
           <td>{{ user.id }}</td>
@@ -76,7 +76,7 @@
           <td>{{ user.email }}</td>
           <td>{{ user.password }}</td>
           <td>{{user.dateCreated | date }}</td>
-          <td>{{ user.role ? 'admin' : 'user'}}</td>
+          <td>{{ user.role ? 'user' : 'admin'}}</td>
           <td>
             <ng-template #popTemplateHtml>
               <h6>Do you want to really deleted ?</h6>

@@ -13,7 +13,7 @@ const routes: Routes = [
     },
     children: [
       {
-        path: 'user',
+        path: 'user/:page',
         component: UserComponent,
         data: {
           title: 'User'

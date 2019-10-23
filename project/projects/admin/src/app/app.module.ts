@@ -78,16 +78,16 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
       provide: LocationStrategy,
       useClass: HashLocationStrategy,
     },
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: JwtInterceptor,
-      multi: true
-    },
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: ErrorInterceptor,
-      multi: true
-    },
+    // {
+    //   provide: HTTP_INTERCEPTORS,
+    //   useClass: JwtInterceptor,
+    //   multi: true
+    // },
+    // {
+    //   provide: HTTP_INTERCEPTORS,
+    //   useClass: ErrorInterceptor,
+    //   multi: true
+    // },
   ],
   bootstrap: [AppComponent]
 })
