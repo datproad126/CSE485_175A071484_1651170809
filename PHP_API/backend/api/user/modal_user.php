@@ -62,7 +62,7 @@ class user extends DBConnection
    {
       try {
          // insert query
-         $query = "INSERT INTO " . $this->table . "(`username`, `password`, `display_name`, `email`)
+         $query = "INSERT INTO " . $this->table . "(`username`, `password`, `display_name`, `email`, `role`)
          VALUES ( :username, :password, :display_name, :email)";
          // prepare the query
          $stmt = $this->dbc->prepare($query);
@@ -211,7 +211,7 @@ class user extends DBConnection
    {
 
       // select all query
-      $query = "SELECT * FROM " . $this->table_name . "
+      $query = "SELECT * FROM " . $this->table . "
               WHERE
                   username LIKE ? OR display_name LIKE ? OR email LIKE ? OR role LIKE ?
               ORDER BY
@@ -238,12 +238,32 @@ class user extends DBConnection
    // used for paging users
    public function count()
    {
-      $query = "SELECT COUNT(*) as total_rows FROM " . $this->table_name . "";
+      $query = "SELECT COUNT(*) as total_rows FROM " . $this->table . "";
 
-      $stmt = $this->conn->prepare($query);
+      $stmt = $this->dbc->prepare($query);
       $stmt->execute();
       $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
       return $row['total_rows'];
+   }
+   // read products with pagination
+   public function readPaging($from_record_num, $records_per_page)
+   {
+
+      // select query
+      $query = "SELECT *  FROM " . $this->table . "ORDER BY registered_date DESC LIMIT ?, ?";
+
+      // prepare query statement
+      $stmt = $this->dbc->prepare($query);
+
+      // bind variable values
+      $stmt->bindParam(1, $from_record_num, PDO::PARAM_INT);
+      $stmt->bindParam(2, $records_per_page, PDO::PARAM_INT);
+
+      // execute query
+      $stmt->execute();
+
+      // return values from database
+      return $stmt;
    }
 }
