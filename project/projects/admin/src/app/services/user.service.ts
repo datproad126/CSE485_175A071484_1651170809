@@ -1,15 +1,16 @@
 
 import { Injectable } from '@angular/core';
-import { HttpErrorResponse, HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpClient, HttpHeaders, HttpResponse, HttpParams } from '@angular/common/http';
 import { User } from '../models/user';
 import { Observable, throwError } from 'rxjs';
 import { catchError, retry } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+import { AuthenticationService } from './authentication.service';
 
 
 const httpOptions = {
   headers: new HttpHeaders({
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json; charset=UTF-8',
   })
 };
 @Injectable({
@@ -18,36 +19,42 @@ const httpOptions = {
 
 export class UserService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private authenticationService: AuthenticationService) {
+    const currentUser = this.authenticationService.currentUserValue;
+    httpOptions.headers = httpOptions.headers.set('Authorization', 'Bearer: ' + currentUser.token);
+  }
 
   /** GET: get the user from the server */
   readUserData(): Observable<User[]> {
-    const url = `${environment.PHP_API_SERVER}/read.php`; // READ api/user/read.php
+    const url = `${environment.PHP_API_SERVER}/user/read.php`; // READ api/user/read.php
     return this.http.get<User[]>(url, httpOptions)
       .pipe(
-        retry(3),
+        retry(1),
         catchError(this.handleError)
       );
   }
   /** DELETE: delete the user from the server */
-  deleteData(user: User[]): Observable<HttpResponse<User[]>> {
-    const url = `${environment.PHP_API_SERVER}/delete.php`; // DELETE api/user
-    return this.http.post<User[]>(url, user, { observe: 'response' })
+  deleteData(user: User[]): Observable<User[]> {
+    const url = `${environment.PHP_API_SERVER}/user/delete.php`; // DELETE api/user
+    return this.http.post<User[]>(url, user, httpOptions)
       .pipe(
         catchError(this.handleError)
       );
   }
 
-  /** CREATE: delete the user from the server */
-  createUser(user: User[]): Observable<HttpResponse<User[]>> {
-    const observe = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json'
-      }),
-      observe: 'response'
-    };
-    const url = `${environment.PHP_API_SERVER}/delete.php`; // DELETE api/user
-    return this.http.post<HttpResponse<User[]>>(url, user, httpOptions)
+  /** CREATE: create the user from the server */
+  createUser(user: User): Observable<User> {
+    const options = { params: new HttpParams().get(JSON.stringify(user)) };
+    const url = `${environment.PHP_API_SERVER}/user/registered.php`; // CREATE api/user
+    return this.http.post<User>(url, options)
+      .pipe(retry(1),
+        catchError(this.handleError)
+      );
+  }
+  /** UPDATE: update the user from the server */
+  updateUser(user: User): Observable<User[]> {
+    const url = `${environment.PHP_API_SERVER}/authenticate/update.php`; // UPDATE api/user
+    return this.http.post<User[]>(url, user, httpOptions)
       .pipe(
         catchError(this.handleError)
       );

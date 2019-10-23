@@ -37,7 +37,7 @@
       <div class="col-sm-12 col-xl-2 form-group">
         <label style="position: absolute; right: 12px">
           Show:
-          <select class="form-control" [(ngModel)]="entry">
+          <select class="form-control" [(ngModel)]="entry" (change)="isOpenChange($event.target.value)">
             <option *ngFor="let entry of entries" [value]="entry.value"> {{ entry.name }} </option>
           </select>
           entries
@@ -134,15 +134,14 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body">
+      <form [formGroup]="userForm" (ngSubmit)='onSubmit()'>
+        <div class="modal-body">
 
-        <form [formGroup]="userForm" (ngSubmit)='onSubmit()'>
           <div class="row">
             <div class="form-group col">
-
               <label for="UserName">User Name:</label>
               <input type="text" formControlName="UserName" placeholder="User Name" name="UserName" class="form-control"
-                [ngClass]="{'is-invalid': submitted }" id="UserName">
+                [ngClass]="{'is-invalid': submitted  && userfbc.UserName.errors }" id="UserName">
               <div *ngIf="submitted && !!userfbc.UserName.errors" class="invalid-feedback">
                 <div *ngIf="!!userfbc.UserName.errors.required">UserName is required</div>
               </div>
@@ -151,27 +150,37 @@
             <div class="form-group col">
               <label for="DisplayName">Display Name:</label>
               <input type="text" formControlName="DisplayName" placeholder="Display Name" name="DisplayName"
-                [ngClass]="{'is-invalid': submitted }" class="form-control" id="DisplayName">
+                [ngClass]="{'is-invalid': submitted && userfbc.DisplayName.errors}" class="form-control"
+                id="DisplayName">
               <div *ngIf="submitted && !!userfbc.DisplayName.errors" class="invalid-feedback">
                 <div *ngIf="!!userfbc.DisplayName.errors.required">DisplayName is required</div>
               </div>
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="Email">Email:</label>
-            <input type="text" formControlName="Email" placeholder="Email" name="Email" class="form-control"
-              [ngClass]="{ 'is-invalid': submitted }" id="Password">
-            <div *ngIf="submitted && !!userfbc.Email.errors" class="invalid-feedback">
-              <div *ngIf="!!userfbc.Email.errors.required">Email is required</div>
-              <div *ngIf="!!userfbc.Email.errors.minlength">Email must be at least 6 characters</div>
+          <div class="row">
+            <div class="form-group col">
+              <label for="Email">Email:</label>
+              <input type="text" formControlName="Email" placeholder="Email" name="Email" class="form-control"
+                [ngClass]="{ 'is-invalid': submitted  && userfbc.Email.errors }">
+              <div *ngIf="submitted && !!userfbc.Email.errors" class="invalid-feedback">
+                <div *ngIf="!!userfbc.Email.errors.required">Email is required</div>
+                <div *ngIf="!!userfbc.Email.errors.email">Email must be a valid email addresss</div>
+              </div>
+            </div>
+            <div class="form-group col">
+              <label for="Role">Role:</label>
+              <select id="Role" name="Role" class="form-control" formControlName="Role">
+                <option *ngFor="let role of roles" [value]="role.value">
+                  {{ role.name }}
+                </option>
+              </select>
             </div>
           </div>
-
           <div class="form-group">
             <label for="Password">Password:</label>
             <input type="password" formControlName="Password" placeholder="Password" name="Password"
-              class="form-control" [ngClass]="{ 'is-invalid': submitted  }" id="Password">
+              class="form-control" [ngClass]="{ 'is-invalid': submitted && userfbc.Password.errors }">
             <div *ngIf="submitted && !!userfbc.Password.errors" class="invalid-feedback">
               <div *ngIf="!!userfbc.Password.errors.required">Password is required</div>
               <div *ngIf="!!userfbc.Password.errors.minlength">Password must be at least 6 characters</div>
@@ -181,7 +190,7 @@
           <div class="form-group">
             <label for="Confirm">Confirm:</label>
             <input type="password" formControlName="Confirm" placeholder="Confirm" name="Confirm" class="form-control"
-              [ngClass]="{ 'is-invalid': submitted  }" id="Confirm">
+              [ngClass]="{ 'is-invalid': submitted && userfbc.Confirm.errors }">
             <div *ngIf="submitted && !!userfbc.Confirm.errors" class="invalid-feedback">
               <div *ngIf="!!userfbc.Confirm.errors.required">Confirm Password is required</div>
               <div *ngIf="!!userfbc.Confirm.errors.mustMatch">Passwords must match</div>
@@ -189,28 +198,24 @@
 
           </div>
 
-          <div class="form-group">
-            <label for="Role">Role:</label>
-            <select id="Role" name="Role" class="form-control">
-              <option value="0">Admin</option>
-              <option value="1">user</option>
-            </select>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="userModal.hide()"><i class="fa fa-remove"></i>
-          Close</button>
-        <button type="submit" class="btn btn-primary">
-          <ng-container *ngIf="!isEdit; else elseTemplate">
-            <i class="fa fa-user-plus"></i> Add User
-          </ng-container>
-          <ng-template #elseTemplate>
-            <i class="fa fa-pencil"></i> Edit User
-          </ng-template>
-        </button>
 
-      </div>
+
+        </div>
+        <div class="modal-footer">
+          <div class="form-group">
+            <button type="button" class="btn btn-secondary" (click)="userModal.hide()"><i class="fa fa-remove"></i>
+              Close</button>
+            <button type="submit" class="btn btn-primary">
+              <ng-container *ngIf="!isEdit; else elseTemplate">
+                <i class="fa fa-user-plus"></i> Add User
+              </ng-container>
+              <ng-template #elseTemplate>
+                <i class="fa fa-pencil"></i> Edit User
+              </ng-template>
+            </button>
+          </div>
+        </div>
+      </form>
     </div><!-- /.modal-content -->
   </div>
   <!-- /.modal-dialog-->

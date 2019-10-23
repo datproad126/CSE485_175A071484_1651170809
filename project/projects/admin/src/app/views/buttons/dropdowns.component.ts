@@ -19,7 +19,7 @@ export class DropdownsComponent implements OnDestroy {
 
   constructor() { }
 
-  ngOnDestroy () {
+  ngOnDestroy() {
     this.status.isOpen = false;
   }
 

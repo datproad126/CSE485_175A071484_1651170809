@@ -9,7 +9,8 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { PopoverDirective } from 'ngx-bootstrap';
 import { ToastrService } from 'ngx-toastr';
-import { MustMatchpwd } from './must-matchpwd';
+import { MustMatchpwd } from '../../helpers/MustMatchpwd';
+import { Role } from '../../models/Role';
 
 @Component({
   selector: 'app-user',
@@ -20,16 +21,18 @@ import { MustMatchpwd } from './must-matchpwd';
 export class UserComponent implements OnInit, OnDestroy {
   // test observerble
   users: User[];
+  user: any;
   destroy$: Subject<boolean> = new Subject<boolean>();
   // checkbox
   itemSelected: any[] = [];
   selectAll: boolean;
   // table
   userForm: FormGroup;
-  // editedUser: any;
   isEdit = false;
   submitted = false;
-  emptyUser: User = { id: null, username: null, password: null, name: null, email: null, dateCreated: null, role: null };
+  loading = false;
+  roles: any;
+  role: any;
 
   // pagnation
   totalItems = 64;
@@ -54,42 +57,60 @@ export class UserComponent implements OnInit, OnDestroy {
       { name: '100', value: 100 }
     ];
 
+    this.roles = [
+      { name: 'Admin', value: 0 },
+      { name: 'User', value: 1 }
+    ];
+
     this.userForm = this.fb.group({
       UserName: ['', Validators.required],
       DisplayName: ['', Validators.required],
       Email: ['', [Validators.required, Validators.email]],
-      Password: ['', Validators.required, Validators.minLength(30)],
+      Password: ['', [Validators.required, Validators.minLength(6)]],
       Confirm: ['', Validators.required],
       Role: ['', Validators.required]
     },
       {
-        validators: MustMatchpwd('Password', 'Confirm')
+        validator: MustMatchpwd('Password', 'Confirm')
       });
 
-    this.setForm(this.emptyUser);
     this.readData();
   }
 
   // validate form
-  setForm(user: User): void {
-    this.userForm.patchValue({
-      UserName: [user.username, Validators.required],
-      DisplayName: [user.name, Validators.required],
-      Email: [user.email, [Validators.required, Validators.email]],
-      Role: [user.role, Validators.required],
-    });
-    this.isEdit = !!user.username;
+  setForm(user: any): void {
+    if (user == null) {
+      this.userForm.patchValue({});
+    } else {
+      this.userForm.patchValue({
+        UserName: [user.username, Validators.required],
+        Password: [user.password, Validators.required],
+        DisplayName: [user.name, Validators.required],
+        Email: [user.email, [Validators.required, Validators.email]],
+        Role: [user.role, Validators.required]
+      });
+    }
+  }
+  setUserJson(): void {
+    this.user = {
+      username: this.userfbc.UserName.value,
+      password: this.userfbc.Password.value,
+      name: this.userfbc.DisplayName.value,
+      email: this.userfbc.Email.value,
+      role: this.userfbc.Role.value
+    };
   }
 
   get userfbc() { return this.userForm.controls; }
 
   createNewUser(): void {
-    this.setForm(this.emptyUser);
+    this.setForm(null);
     this.userModal.show();
   }
 
   editUser(user: User): void {
     this.setForm(user);
+    this.isEdit = true;
     this.userModal.show();
   }
 
@@ -104,14 +125,20 @@ export class UserComponent implements OnInit, OnDestroy {
 
   onSubmit() {
     this.submitted = true;
-
     // stop here if form is invalid
     if (this.userForm.invalid) {
       return;
     }
+    this.loading = true;
+    this.setUserJson();
 
+    if (this.isEdit == true) {
+      this.updateData(this.user);
+    } else {
+      this.createData(this.user);
+    }
     // display form values on success
-    alert('SUCCESS!! =))\n\n' + JSON.stringify(this.userForm.value, null, 4));
+    alert('SUCCESS!! :-)\n\n' + JSON.stringify(this.userForm.value));
   }
 
   onReset() {
@@ -130,7 +157,7 @@ export class UserComponent implements OnInit, OnDestroy {
     const usersObservable = this.userService.readUserData().pipe(takeUntil(this.destroy$));
     const usersObserverhttp = {
       next: (data) => {
-        this.users = data.user;
+        this.users = data['user'];
         this.bigTotalItems = this.users.length;
       },
       error: err => console.error('Observer got an error: ' + err),
@@ -154,12 +181,11 @@ export class UserComponent implements OnInit, OnDestroy {
   }
 
   /** CREATE: create the user from userservice */
-  createData(): void {
-    const usersObservable = this.userService.readUserData().pipe(takeUntil(this.destroy$));
+  createData(user: User): void {
+    const usersObservable = this.userService.createUser(user).pipe(takeUntil(this.destroy$));
     const usersObserverhttp = {
-      next: (data) => {
-        this.users = data.user;
-        this.bigTotalItems = this.users.length;
+      next: () => {
+        this.readData();
       },
       error: err => console.error('Observer got an error: ' + err),
       complete: () => console.log('Observer got a complete notification')
@@ -168,12 +194,11 @@ export class UserComponent implements OnInit, OnDestroy {
   }
 
   /** UPDATE: update the user from userservice */
-  updateData(): void {
-    const usersObservable = this.userService.readUserData().pipe(takeUntil(this.destroy$));
+  updateData(user: User): void {
+    const usersObservable = this.userService.updateUser(user).pipe(takeUntil(this.destroy$));
     const usersObserverhttp = {
-      next: (data) => {
-        this.users = data.user;
-        this.bigTotalItems = this.users.length;
+      next: () => {
+        this.readData();
       },
       error: err => console.error('Observer got an error: ' + err),
       complete: () => console.log('Observer got a complete notification')
@@ -191,7 +216,9 @@ export class UserComponent implements OnInit, OnDestroy {
       this.itemSelected[item.id] = event;
     }
   }
-
+  isOpenChange(event: any) {
+    console.log(Number(event));
+  }
   // pagnation function
   pageChanged(event: any): void {
     // this.configPagination.currentPage = event.page;

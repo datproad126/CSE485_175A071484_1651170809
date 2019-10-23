@@ -7,11 +7,10 @@ import { DefaultLayoutComponent } from './containers';
 import { P404Component } from './views/error/404.component';
 import { P500Component } from './views/error/500.component';
 import { LoginComponent } from './login/login.component';
-// import { LoginComponent } from './views/login/login.component';
 import { RegisterComponent } from './views/register/register.component';
 // Import guard
 import { AuthGuard } from './helpers/auth.guard';
-
+import { Role } from './models/Role';
 export const routes: Routes = [
   {
     path: '',
@@ -50,14 +49,14 @@ export const routes: Routes = [
     path: '',
     component: DefaultLayoutComponent,
     data: {
-      title: 'Home'
+      title: 'Home',
     },
     canActivate: [AuthGuard],
-    canActivateChild: [AuthGuard],
     children: [
       {
         path: 'admin',
-        loadChildren: () => import('./admin/admin.module').then(m => m.AdminModule)
+        loadChildren: () => import('./admin/admin.module').then(m => m.AdminModule),
+        // data: { roles: [Role.Admin] }
       },
       {
         path: 'base',
@@ -91,7 +90,8 @@ export const routes: Routes = [
         path: 'widgets',
         loadChildren: () => import('./views/widgets/widgets.module').then(m => m.WidgetsModule)
       }
-    ]
+    ],
+
   },
   { path: '**', component: P404Component }
 ];
@@ -100,7 +100,7 @@ export const routes: Routes = [
   imports: [
     RouterModule.forRoot(
       routes,
-      { onSameUrlNavigation: 'reload', enableTracing: true } // <-- debugging purposes only
+      { onSameUrlNavigation: 'reload', enableTracing: false } // <-- debugging purposes only
     )
   ],
   exports: [
