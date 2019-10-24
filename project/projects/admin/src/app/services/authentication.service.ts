@@ -1,11 +1,15 @@
-import { environment } from '../../environments/environment';
 import { map, catchError } from 'rxjs/operators';
 import { User } from '../models/user';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 
-
+const PHP_API_SERVER = 'https://cse485tech.000webhostapp.com/PHP_API/backend/api';
+const httpOptions = {
+    headers: new HttpHeaders({
+        'Content-Type': 'application/json; charset=UTF-8',
+    })
+};
 @Injectable({
     providedIn: 'root'
 })
@@ -22,21 +26,35 @@ export class AuthenticationService {
         return this.currentUserSubject.value;
     }
 
-    login(username: string, password: string) {
-        return this.http.post<any>(`${environment.apiUrl}/users/authenticate`, { username, password })
+    login(loginInput: string, password: string): Observable<any> {
+        return this.http.post<any>(
+            `${PHP_API_SERVER}/authentication/login.php`,
+            JSON.stringify({ loginInput, password }),
+            // httpOptions
+        )
             .pipe(
+                // retry(2),
                 map(
                     user => {
                         // store user details and jwt token in local storage to keep user logged in between page refreshes
                         localStorage.setItem('currentUser', JSON.stringify(user));
                         this.currentUserSubject.next(user);
                         return user;
-                    }
-                ),
+                    }),
                 catchError(this.handleError)
             );
     }
 
+    register(registerForm: any): Observable<any> {
+        return this.http.post<any>(
+            `${PHP_API_SERVER}/user/registered.php`,
+            JSON.stringify(registerForm),
+            // httpOptions
+        )
+            .pipe(
+                catchError(this.handleError)
+            );
+    }
     logout() {
         // remove user from local storage to log user out
         localStorage.removeItem('currentUser');

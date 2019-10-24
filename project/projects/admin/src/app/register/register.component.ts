@@ -1,15 +1,74 @@
 import { Component, OnInit } from '@angular/core';
-
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AuthenticationService } from './../services/authentication.service';
+import { MustMatchpwd } from '../helpers/MustMatchpwd';
+import { first } from 'rxjs/operators';
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent implements OnInit {
-
-  constructor() { }
-
-  ngOnInit() {
+  registerForm: FormGroup;
+  loading = false;
+  submitted = false;
+  returnUrl: string;
+  error = '';
+  constructor(
+    private formBuilder: FormBuilder,
+    private route: ActivatedRoute,
+    private router: Router,
+    private authenticationService: AuthenticationService
+  ) {
+    // redirect to home if already logged in
+    if (this.authenticationService.currentUserValue) {
+      this.router.navigate(['/']);
+    }
   }
 
+  ngOnInit() {
+    this.registerForm = this.formBuilder.group({
+      UserName: ['', Validators.required],
+      DisplayName: ['', Validators.required],
+      Email: ['', [Validators.required, Validators.email]],
+      Password: ['', [Validators.required, Validators.minLength(6)]],
+      Confirm: ['', Validators.required],
+    },
+      {
+        validator: MustMatchpwd('Password', 'Confirm')
+      });
+    // convenience getter for easy access to form fields
+    // get return url from route parameters or default to '/'
+    this.returnUrl = this.route.snapshot.queryParams.returnUrl || '/login';
+  }
+
+  get f() { return this.registerForm.controls; }
+
+  onSubmit() {
+    this.submitted = true;
+
+    // stop here if form is invalid
+    if (this.registerForm.invalid) {
+      return;
+    }
+    const formReq = {
+      username: this.f.UserName.value,
+      password: this.f.Password.value,
+      name: this.f.DisplayName.value,
+      email: this.f.Email.value,
+      role: 0
+    };
+    // console.log(this.registerForm.value);
+    this.authenticationService.register(formReq)
+      .pipe(first())
+      .subscribe(
+        data => {
+          this.router.navigate([this.returnUrl]);
+        },
+        error => {
+          this.error = error;
+          this.loading = false;
+        });
+  }
 }

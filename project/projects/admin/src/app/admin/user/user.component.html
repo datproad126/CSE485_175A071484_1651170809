@@ -1,19 +1,25 @@
 <div class="card">
   <div class="card-header">
     <div class="row">
-      <div class="col-8 col-md-8">
+      <div class="col-9 col-md-9">
         <!-- <i class="fa fa-align-justify"></i> -->
         <button type="button" class="btn btn-outline-primary" data-toggle="modal" (click)="createNewUser()">
           <i class="fa fa-user-plus"></i>
           Add
           User</button>
       </div>
-      <div class="col-4 col-md-4">
+      <div class="col-3 col-md-3">
         <div class="input-group">
-          <input type="text" id="input1-group2" name="input1-group2" class="form-control" placeholder="Username">
-          <span class="input-group-prepend">
-            <button type="button" class="btn btn-outline-primary"><i class="fa fa-search"></i> Search</button>
-          </span>
+          <input [(ngModel)]="selected" [typeahead]="filterSearchingRes" [isAnimated]="true" class="form-control"
+            (keyup.enter)="searchingWithFilter($event)" [typeaheadOptionsLimit]="10"
+            (typeaheadOnSelect)="typeaheadOnSelect($event)" placeholder="searching">
+          <div class="input-group-append" dropdown>
+
+            <select class="form-control" [(ngModel)]="filterSearching"
+              (change)="isOpenChangeFilterSearching($event.target.value)" name="fieldUser">
+              <option *ngFor="let fieldUser of fieldUsers" [value]="fieldUser.value"> {{ fieldUser.name }} </option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
@@ -24,20 +30,26 @@
       <div class="col-sm-12 col-xl-10">
 
         <label>
-          Filter by status:
-          <select class="form-control" id="filter" name="filter">
-            <option value="0">Option #</option>
-            <option value="1">Option #1</option>
-            <option value="2">Option #2</option>
-            <option value="3">Option #3</option>
+          Filter by field of users:
+          <select class="form-control" [(ngModel)]="filter" (change)="isOpenChangeFilter($event.target.value)"
+            name="filterUser">
+            <option *ngFor="let filterUser of fieldUsers" [value]="filterUser.value"> {{ filterUser.name }} </option>
+          </select>
+        </label>
+        <label>
+          Sort by:
+          <select class="form-control" [(ngModel)]="sort" (change)="isOpenChangeSort($event.target.value)"
+            name="sortUser">
+            <option *ngFor="let sortUser of sorts" [value]="sortUser.value"> {{ sortUser.name }} </option>
           </select>
         </label>
 
       </div>
-      <div class="col-sm-12 col-xl-2 form-group">
+      <div class="col-sm-12 col-xl-2">
         <label style="position: absolute; right: 12px">
           Show:
-          <select class="form-control" [(ngModel)]="entry">
+          <select class="form-control" [(ngModel)]="entry" (change)="isOpenChangeEntry($event.target.value)"
+            name="entry">
             <option *ngFor="let entry of entries" [value]="entry.value"> {{ entry.name }} </option>
           </select>
           entries
@@ -51,12 +63,35 @@
          </div> -->
 
     </div>
+    <div class="row">
+      <div class="col">
+        <label>
+          check all
+          <button class="checkboxAll btn btn-ghost-secondary" (click)="checkUncheckAll($event)" name="entry"
+            title="check all">
+            <!-- <input class="btn btn-square btn-outline-secondary" type="checkbox" [(ngModel)]="selectAll" (ngModelChange)="checkUncheckAll($event)"> -->
+            <ng-container *ngIf="selectAll; else unselectAll">
+              <i class="fa fa-check-square font-xl" (click)="checkUncheckAll($event)"></i>
+            </ng-container>
+            <ng-template #unselectAll>
+              <i class="fa fa-square-o font-xl" (click)="checkUncheckAll($event)"></i>
+            </ng-template>
+          </button>
+        </label>
+        <ng-container *ngIf="isVisible">
+          <button type="button" class=" checkboxAll btn btn-ghost-danger" data-toggle="modal" (click)="deleteAll()"
+            title="delete all">
+            <i class="cui-trash icons font-xl"></i>
+          </button>
+        </ng-container>
+      </div>
+    </div>
   </div>
   <div class="card-body">
     <table class="table table-striped">
       <thead>
         <tr>
-          <th><input type="checkbox" [(ngModel)]="selectAll" (ngModelChange)="checkUncheckAll($event)"></th>
+          <th>Checkbox</th>
           <th>ID</th>
           <th>UserName</th>
           <th>Display Name</th>
@@ -68,15 +103,17 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let user of getItems()">
-          <td><input type="checkbox" [(ngModel)]="itemSelected[user.id]" (ngModelChange)="onChange($event)"></td>
+        <tr *ngFor="let user of users">
+          <td style="text-align: center;">
+            <input type="checkbox" [(ngModel)]="itemSelected[user.id]" (ngModelChange)="onChange($event)">
+          </td>
           <td>{{ user.id }}</td>
           <td>{{ user.username }}</td>
           <td>{{ user.name }}</td>
           <td>{{ user.email }}</td>
-          <td>{{ user.password }}</td>
+          <td>{{ user.password | slice : 0 : 24}}...</td>
           <td>{{user.dateCreated | date }}</td>
-          <td>{{ user.role ? 'admin' : 'user'}}</td>
+          <td>{{ user.role ? 'user' : 'admin'}}</td>
           <td>
             <ng-template #popTemplateHtml>
               <h6>Do you want to really deleted ?</h6>
@@ -134,15 +171,14 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body">
+      <form [formGroup]="userForm" (ngSubmit)='onSubmit()'>
+        <div class="modal-body">
 
-        <form [formGroup]="userForm" (ngSubmit)='onSubmit()'>
           <div class="row">
             <div class="form-group col">
-
               <label for="UserName">User Name:</label>
               <input type="text" formControlName="UserName" placeholder="User Name" name="UserName" class="form-control"
-                [ngClass]="{'is-invalid': submitted }" id="UserName">
+                [ngClass]="{'is-invalid': submitted  && userfbc.UserName.errors }" id="UserName">
               <div *ngIf="submitted && !!userfbc.UserName.errors" class="invalid-feedback">
                 <div *ngIf="!!userfbc.UserName.errors.required">UserName is required</div>
               </div>
@@ -151,27 +187,37 @@
             <div class="form-group col">
               <label for="DisplayName">Display Name:</label>
               <input type="text" formControlName="DisplayName" placeholder="Display Name" name="DisplayName"
-                [ngClass]="{'is-invalid': submitted }" class="form-control" id="DisplayName">
+                [ngClass]="{'is-invalid': submitted && userfbc.DisplayName.errors}" class="form-control"
+                id="DisplayName">
               <div *ngIf="submitted && !!userfbc.DisplayName.errors" class="invalid-feedback">
                 <div *ngIf="!!userfbc.DisplayName.errors.required">DisplayName is required</div>
               </div>
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="Email">Email:</label>
-            <input type="text" formControlName="Email" placeholder="Email" name="Email" class="form-control"
-              [ngClass]="{ 'is-invalid': submitted }" id="Password">
-            <div *ngIf="submitted && !!userfbc.Email.errors" class="invalid-feedback">
-              <div *ngIf="!!userfbc.Email.errors.required">Email is required</div>
-              <div *ngIf="!!userfbc.Email.errors.minlength">Email must be at least 6 characters</div>
+          <div class="row">
+            <div class="form-group col">
+              <label for="Email">Email:</label>
+              <input type="text" formControlName="Email" placeholder="Email" name="Email" class="form-control"
+                [ngClass]="{ 'is-invalid': submitted  && userfbc.Email.errors }">
+              <div *ngIf="submitted && !!userfbc.Email.errors" class="invalid-feedback">
+                <div *ngIf="!!userfbc.Email.errors.required">Email is required</div>
+                <div *ngIf="!!userfbc.Email.errors.email">Email must be a valid email addresss</div>
+              </div>
+            </div>
+            <div class="form-group col">
+              <label for="Role">Role:</label>
+              <select id="Role" name="Role" class="form-control" formControlName="Role">
+                <option *ngFor="let role of roles" [value]="role.value">
+                  {{ role.name }}
+                </option>
+              </select>
             </div>
           </div>
-
           <div class="form-group">
             <label for="Password">Password:</label>
             <input type="password" formControlName="Password" placeholder="Password" name="Password"
-              class="form-control" [ngClass]="{ 'is-invalid': submitted  }" id="Password">
+              class="form-control" [ngClass]="{ 'is-invalid': submitted && userfbc.Password.errors }">
             <div *ngIf="submitted && !!userfbc.Password.errors" class="invalid-feedback">
               <div *ngIf="!!userfbc.Password.errors.required">Password is required</div>
               <div *ngIf="!!userfbc.Password.errors.minlength">Password must be at least 6 characters</div>
@@ -181,7 +227,7 @@
           <div class="form-group">
             <label for="Confirm">Confirm:</label>
             <input type="password" formControlName="Confirm" placeholder="Confirm" name="Confirm" class="form-control"
-              [ngClass]="{ 'is-invalid': submitted  }" id="Confirm">
+              [ngClass]="{ 'is-invalid': submitted && userfbc.Confirm.errors }">
             <div *ngIf="submitted && !!userfbc.Confirm.errors" class="invalid-feedback">
               <div *ngIf="!!userfbc.Confirm.errors.required">Confirm Password is required</div>
               <div *ngIf="!!userfbc.Confirm.errors.mustMatch">Passwords must match</div>
@@ -189,28 +235,24 @@
 
           </div>
 
-          <div class="form-group">
-            <label for="Role">Role:</label>
-            <select id="Role" name="Role" class="form-control">
-              <option value="0">Admin</option>
-              <option value="1">user</option>
-            </select>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="userModal.hide()"><i class="fa fa-remove"></i>
-          Close</button>
-        <button type="submit" class="btn btn-primary">
-          <ng-container *ngIf="!isEdit; else elseTemplate">
-            <i class="fa fa-user-plus"></i> Add User
-          </ng-container>
-          <ng-template #elseTemplate>
-            <i class="fa fa-pencil"></i> Edit User
-          </ng-template>
-        </button>
 
-      </div>
+
+        </div>
+        <div class="modal-footer">
+          <div class="form-group">
+            <button type="button" class="btn btn-secondary" (click)="userModal.hide()"><i class="fa fa-remove"></i>
+              Close</button>
+            <button type="submit" class="btn btn-primary">
+              <ng-container *ngIf="!isEdit; else elseTemplate">
+                <i class="fa fa-user-plus"></i> Add User
+              </ng-container>
+              <ng-template #elseTemplate>
+                <i class="fa fa-pencil"></i> Edit User
+              </ng-template>
+            </button>
+          </div>
+        </div>
+      </form>
     </div><!-- /.modal-content -->
   </div>
   <!-- /.modal-dialog-->

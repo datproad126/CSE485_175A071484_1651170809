@@ -11,6 +11,7 @@ import { Error404Component } from './error/error404.component';
 import { Error500Component } from './error/error500.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
+import { LocationStrategy, PathLocationStrategy } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,12 @@ import { RegisterComponent } from './register/register.component';
     BrowserModule,
     AppRoutingModule,
   ],
-  providers: [],
+  providers: [
+    {
+      provide: LocationStrategy,
+      useClass: PathLocationStrategy,
+    },
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

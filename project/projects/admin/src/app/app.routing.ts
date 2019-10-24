@@ -7,8 +7,7 @@ import { DefaultLayoutComponent } from './containers';
 import { P404Component } from './views/error/404.component';
 import { P500Component } from './views/error/500.component';
 import { LoginComponent } from './login/login.component';
-// import { LoginComponent } from './views/login/login.component';
-import { RegisterComponent } from './views/register/register.component';
+import { RegisterComponent } from './register/register.component';
 // Import guard
 import { AuthGuard } from './helpers/auth.guard';
 
@@ -53,7 +52,6 @@ export const routes: Routes = [
       title: 'Home'
     },
     canActivate: [AuthGuard],
-    canActivateChild: [AuthGuard],
     children: [
       {
         path: 'admin',
@@ -100,7 +98,7 @@ export const routes: Routes = [
   imports: [
     RouterModule.forRoot(
       routes,
-      { onSameUrlNavigation: 'reload', enableTracing: true } // <-- debugging purposes only
+      { onSameUrlNavigation: 'reload', enableTracing: false } // <-- debugging purposes only
     )
   ],
   exports: [
