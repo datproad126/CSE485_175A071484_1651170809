@@ -1,0 +1,3 @@
+[submodule "PHP_API/backend/api/libs/jwt"]
+	path = PHP_API/backend/api/libs/jwt
+	url = https://github.com/lcobucci/jwt.git
