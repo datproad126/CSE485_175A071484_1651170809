@@ -1,16 +1,22 @@
 <?php
-session_start();
 // required headers
-header("Access-Control-Allow-Origin: http://localhost/api/");
+header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Max-Age: 3600");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, X-Requested-With");
 
 // database connection will be here
 // files needed to connect to database
 include_once '../conf/settings.config.php';
-include_once '../user/modal_user.php';
+include_once '../modals/user.php';
+
+// files for jwt will be here
+// generate json web token
+require '../conf/core.php';
+require '../libs/vendor/autoload.php';
+
+use Lcobucci\JWT\Builder;
 
 // get database connection and instantiate product object
 $user = new user($localhost);
@@ -20,49 +26,55 @@ $user = new user($localhost);
 $data = json_decode(file_get_contents("php://input"));
 
 // set product property values
-$user->email = $data->email_or_username;
-$user->username = $data->email_or_username;
-
-$email_or_user_exists = $user->emailOrUserExists();
-
-// files for jwt will be here
-// generate json web token
-include_once '../conf/core.php';
-include_once '../libs/php-jwt/src/BeforeValidException.php';
-include_once '../libs/php-jwt/src/ExpiredException.php';
-include_once '../libs/php-jwt/src/SignatureInvalidException.php';
-include_once '../libs/php-jwt/src/JWT.php';
-
-use \Firebase\JWT\JWT;
+// var_dump(file_get_contents("php://input"));
+if (filter_var($data->loginInput, FILTER_VALIDATE_EMAIL)) {
+    $user->email = $data->loginInput;
+    $input_exists = $user->auth_emailOrUserExists();
+} else {
+    $user->username = $data->loginInput;
+    $input_exists = $user->auth_emailOrUserExists();
+}
 
 // generate jwt will be here
 // check if email exists and if password is correct
-if ($email_or_user_exists && password_verify($data->password, $user->password)) {
-
-    $token = array(
-        "iss" => $iss,
-        "aud" => $aud,
-        "iat" => $iat,
-        "nbf" => $nbf,
-        "data" => array(
-            "id" => $user->id,
-            "username" => $user->username,
-            "name" => $user->name,
-            "email" => $user->email
-        )
-    );
+if ($input_exists && password_verify($data->password, $user->password)) {
 
     // set response code
     http_response_code(200);
 
     // generate jwt
-    $jwt = JWT::encode($token, $key);
+    $user->token = (new Builder())  // Configures the issuer (iss claim)
+        ->issuedBy($iss)
+        // Configures the id (jti claim)
+        ->identifiedBy($jti)
+        // Configures the time that the token was issue (iat claim)
+        ->issuedAt($time)
+        // Configures the time that the token can be used (nbf claim)
+        ->canOnlyBeUsedAfter($nbf)
+        // Configures the expiration time of the token (exp claim)
+        ->expiresAt($exp)
+        // Configures a new claim, called "uid"
+        ->withClaim(
+            'data',
+            array(
+                "id" => $user->id,
+                "username" => $user->username,
+                "name" => $user->display_name,
+                "email" => $user->email,
+                "role" => $user->role
+            )
+        ) // Data related to the signer user
+        // Configures a new header, called "foo"
+        ->withHeader('foo', 'bar')
+        // Builds a new token
+        ->getToken($signer, $Key);
+
     echo json_encode(
         array(
-            "message" => "Successful login.",
-            "jwt" => $jwt
+            "message" => "you have a new token",
+            "token" => strval($user->token)
         )
-    );
+    ); // The string representation of the object is a JWT string (pretty easy, right?)
 }
 
 // login failed will be here

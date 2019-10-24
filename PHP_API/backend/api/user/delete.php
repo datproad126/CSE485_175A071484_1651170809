@@ -7,8 +7,9 @@ header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Origin, Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 // include database and object file
+require_once('../authentication/validate.php');
 require_once('../conf/settings.config.php');
-require_once('modal_user.php');
+require_once('../modals/user.php');
  
 // get database connection
 $user = new user($localhost);
@@ -19,8 +20,10 @@ $data = json_decode(file_get_contents("php://input"));
 // set user id to be deleted
 $user->id = $data->id;
 $user->username = $data->username;
+
+$authO = Authorization();
 // delete the user
-if($user->delete()){
+if($user->delete() && $authO->role == "0"){
  
     // set response code - 200 ok
     http_response_code(200);
